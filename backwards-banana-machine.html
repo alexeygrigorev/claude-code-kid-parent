@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍌 Backwards Banana Machine 🍌</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #ffffcc 0%, #ffdd88 50%, #ffcc44 100%);
+            color: #333;
+            padding: 20px;
+            transition: transform 0.5s ease;
+            overflow-x: hidden;
+        }
+
+        body.upside-down {
+            transform: rotate(180deg);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #ffaa00;
+            text-shadow: 3px 3px 0 #ff6600, -1px -1px 0 #ffcc00;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #cc6600;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .banana-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .big-banana {
+            font-size: 8rem;
+            cursor: pointer;
+            user-select: none;
+            animation: dance 2s ease-in-out infinite;
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .big-banana:hover {
+            transform: scale(1.2);
+        }
+
+        .big-banana .face {
+            position: absolute;
+            font-size: 2rem;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes dance {
+            0%, 100% { transform: rotate(-10deg) translateY(0); }
+            25% { transform: rotate(10deg) translateY(-20px); }
+            50% { transform: rotate(-10deg) translateY(0); }
+            75% { transform: rotate(10deg) translateY(-20px); }
+        }
+
+        body.upside-down .big-banana {
+            animation: danceReverse 2s ease-in-out infinite;
+        }
+
+        @keyframes danceReverse {
+            0%, 100% { transform: rotate(10deg) translateY(0); }
+            25% { transform: rotate(-10deg) translateY(-20px); }
+            50% { transform: rotate(10deg) translateY(0); }
+            75% { transform: rotate(-10deg) translateY(-20px); }
+        }
+
+        .banana-sound {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #ff6600;
+            min-height: 40px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .flip-btn {
+            display: block;
+            margin: 0 auto 20px;
+            background: linear-gradient(180deg, #ff6600 0%, #cc4400 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-family: 'Comic Sans MS', cursive;
+            cursor: pointer;
+            border-radius: 25px;
+            box-shadow: 0 5px 0 #993300;
+            transition: all 0.2s;
+        }
+
+        .flip-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #993300;
+        }
+
+        .flip-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 3px 0 #993300;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.8);
+            border: 3px solid #ffaa00;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section h3 {
+            text-align: center;
+            color: #ff6600;
+            margin-bottom: 15px;
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            font-family: 'Comic Sans MS', cursive;
+            border: 2px solid #ffaa00;
+            border-radius: 10px;
+            background: #ffffee;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            height: 70px;
+            resize: none;
+        }
+
+        .action-btn {
+            width: 100%;
+            background: linear-gradient(180deg, #ffcc00 0%, #ffaa00 100%);
+            color: #333;
+            border: none;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-family: 'Comic Sans MS', cursive;
+            cursor: pointer;
+            border-radius: 15px;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #cc8800;
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(180deg, #ffdd00 0%, #ffcc00 100%);
+        }
+
+        .result-box {
+            background: #ffeeaa;
+            border: 2px dashed #ffaa00;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #cc6600;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sound-effect {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #ff6600;
+            font-style: italic;
+            margin-top: 10px;
+            min-height: 25px;
+        }
+
+        .banana-points {
+            background: linear-gradient(135deg, #ffdd00 0%, #ffaa00 100%);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .points-display {
+            font-size: 2rem;
+        }
+
+        .king-badge {
+            display: none;
+            background: linear-gradient(135deg, #ffcc00 0%, #ff8800 100%);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 10px;
+            font-weight: bold;
+            animation: glow 1s infinite;
+        }
+
+        .king-badge.show {
+            display: block;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 10px #ffaa00; }
+            50% { box-shadow: 0 0 30px #ffaa00; }
+        }
+
+        .master-badge {
+            display: none;
+            background: linear-gradient(135deg, #8844ff 0%, #6622cc 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+            animation: masterGlow 1s infinite;
+        }
+
+        .master-badge.show {
+            display: block;
+        }
+
+        @keyframes masterGlow {
+            0%, 100% { box-shadow: 0 0 15px #8844ff; }
+            50% { box-shadow: 0 0 35px #8844ff; }
+        }
+
+        .challenge-word {
+            font-size: 3rem;
+            text-align: center;
+            color: #ff6600;
+            padding: 30px;
+            background: #ffeeaa;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            letter-spacing: 10px;
+        }
+
+        .challenge-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .guess-btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 1rem;
+            font-family: 'Comic Sans MS', cursive;
+            cursor: pointer;
+            border-radius: 10px;
+            border: none;
+            background: #ffaa00;
+            font-weight: bold;
+        }
+
+        .guess-btn:hover {
+            background: #ffcc00;
+        }
+
+        .reveal-btn {
+            background: #ff6600;
+            color: white;
+        }
+
+        .backwards-fact {
+            background: #eebbff;
+            border: 2px solid #aa66cc;
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 15px;
+            text-align: center;
+            font-style: italic;
+            color: #7744aa;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #cc6600;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍌 BACKWARDS BANANA MACHINE 🍌</h1>
+        <p class="subtitle">Everything goes SIRETTEKCAB here!</p>
+
+        <button class="flip-btn" onclick="flipUpsideDown()">🙃 FLIP UPSIDE DOWN! 🙃</button>
+
+        <div class="banana-points">
+            <div style="font-size: 1rem; margin-bottom: 5px;">BANANA POINTS:</div>
+            <div class="points-display" id="bananaPoints">🍌🍌🍌</div>
+            <div class="king-badge" id="kingBadge">
+                👑 BANANA KING/QUEEN! 👑
+            </div>
+        </div>
+
+        <div class="banana-section">
+            <div class="big-banana" id="bigBanana" onclick="bananaClick()">
+                🍌<span class="face">😊</span>
+            </div>
+            <div class="banana-sound" id="bananaSound">Click the banana!</div>
+        </div>
+
+        <div class="section">
+            <h3>🔄 THE BACKWARDS TYPER 🔄</h3>
+            <textarea id="backwardsInput" placeholder="Type something normal..."></textarea>
+            <button class="action-btn" onclick="makeBackwards()">MAKE IT BACKWARDS!</button>
+            <div class="result-box" id="backwardsResult"></div>
+            <div class="sound-effect" id="backwardsSound"></div>
+        </div>
+
+        <div class="section">
+            <h3>💬 BACKWARDS PHRASES 💬</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="guess-btn" onclick="translatePhrase('good morning')">good morning</button>
+                <button class="guess-btn" onclick="translatePhrase('thank you')">thank you</button>
+                <button class="guess-btn" onclick="translatePhrase('I love you')">I love you</button>
+                <button class="guess-btn" onclick="translatePhrase('see you later')">see you later</button>
+                <button class="guess-btn" onclick="translatePhrase('happy birthday')">happy birthday</button>
+                <button class="guess-btn" onclick="translatePhrase('good night')">good night</button>
+            </div>
+            <div class="result-box" id="phraseResult" style="margin-top: 15px;">Click a phrase!</div>
+        </div>
+
+        <div class="section">
+            <h3>🎮 SPEAK BACKWARDS CHALLENGE! 🎮</h3>
+            <div class="score-display">Score: <span id="challengeScore">0</span>/10</div>
+            <div class="challenge-word" id="challengeWord">ELPPA</div>
+            <div style="text-align: center; margin-bottom: 10px;">
+                <input type="text" id="guessInput" placeholder="What word is this?" style="max-width: 200px; text-align: center;">
+            </div>
+            <div class="challenge-buttons">
+                <button class="guess-btn" onclick="submitGuess()">Submit Guess</button>
+                <button class="guess-btn reveal-btn" onclick="revealAnswer()">Reveal!</button>
+                <button class="guess-btn" onclick="newChallengeWord()">New Word</button>
+            </div>
+            <div class="result-box" id="challengeResult" style="font-size: 1rem; padding: 10px;"></div>
+            <div class="master-badge" id="masterBadge">
+                🙃 BACKWARDS MASTER! 🙃<br>
+                You can speak backwards like a pro!
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>📚 BACKWARDS FACTS! 📚</h3>
+            <div class="backwards-fact" id="backwardsFact">
+                Click to learn a backwards fact!
+            </div>
+            <button class="action-btn" onclick="newBackwardsFact()" style="margin-top: 10px; font-size: 1rem; padding: 10px;">New Fact!</button>
+        </div>
+    </div>
+
+    <script>
+        let bananaPoints = parseInt(localStorage.getItem('bananaPoints')) || 0;
+        let challengeScore = parseInt(localStorage.getItem('backwardsScore')) || 0;
+        let currentChallengeWord = '';
+        let isUpsideDown = false;
+
+        const backwardsSounds = ['*KLIM TEG!*', '*OOF OOF!*', '*NAC NUH!*', '!EZEERB', '!ELPPA', '*SDRAWKCAB*'];
+        const bananaSounds = ['*OOF OOF!*', '*GNAP YRRAL!*', '*ANANAB!*', '!SKOOB', '!KCOC', '!SLLAB'];
+
+        const phrases = {
+            'good morning': { back: 'GNINROM DOOG', note: '(Have a good night... backwards!)' },
+            'thank you': { back: 'UOY KNAHT', note: '(You\'re welcome... but reverse!)' },
+            'I love you': { back: 'UOY EVOL I', note: '(That\'s love spelled backwards!)' },
+            'see you later': { back: 'RETAL UOY EES', note: '(See you sooner... maybe?)' },
+            'happy birthday': { back: 'YADHTRIB YPPAH', note: '(Have an unhappy one? No wait... that\'s wrong!)' },
+            'good night': { back: 'THGIN DOOG', note: '(Have a good morning... backwards!)' }
+        };
+
+        const challengeWords = ['APPLE', 'BANANA', 'CAT', 'DOG', 'ELEPHANT', 'FRIEND', 'HAPPY', 'MONKEY', 'PIZZA', 'SCHOOL', 'TIGER', 'WATER', 'ZEBRA', 'HOUSE', 'SMILE', 'CANDY', 'DREAM', 'EARTH', 'FIRE', 'GHOST'];
+
+        const backwardsFacts = [
+            'Did you know? EDOG EVINU T\'NOID UOY! (You know everything backwards!)',
+            'Fun fact: ENOZ NOSLAER EB T\'NOID UOY! (You are a random person backwards!)',
+            'Did you know? EZZERP TEEM NOHTYP NOITAVRESNOC SEY! (Yes everyone celebrates typing backwards!)',
+            'Fun fact: ELBBUB EB YZTICERID NAC UOY! (You can decorate bubbles backwards!)',
+            'Did you know? EMOCLEW EZZERP GNOLA EMOCLEW! (Everyone alone welcomes backwards!)',
+            'Fun fact: NOITCUDORP SI NOITAREBREVER LAICIFITSA! (Artificial is backwards production backwards... wait what?)',
+            'Did you know? EERF SI EERF NOITAREBREVER! (Backwards representation is free backwards!)'
+        ];
+
+        function updateBananaPoints() {
+            document.getElementById('bananaPoints').textContent = '🍌'.repeat(Math.min(bananaPoints, 20));
+            if (bananaPoints >= 50) {
+                document.getElementById('kingBadge').classList.add('show');
+            }
+        }
+
+        function addBananaPoints(amount) {
+            bananaPoints += amount;
+            localStorage.setItem('bananaPoints', bananaPoints);
+            updateBananaPoints();
+        }
+
+        document.getElementById('challengeScore').textContent = challengeScore;
+        updateBananaPoints();
+
+        if (challengeScore >= 10) {
+            document.getElementById('masterBadge').classList.add('show');
+        }
+
+        function bananaClick() {
+            const sound = bananaSounds[Math.floor(Math.random() * bananaSounds.length)];
+            document.getElementById('bananaSound').textContent = sound;
+            addBananaPoints(1);
+        }
+
+        function makeBackwards() {
+            const input = document.getElementById('backwardsInput').value;
+            if (!input) return;
+
+            const backwards = input.split('').reverse().join('').toUpperCase();
+            document.getElementById('backwardsResult').textContent = backwards;
+            document.getElementById('backwardsSound').textContent = backwardsSounds[Math.floor(Math.random() * backwardsSounds.length)];
+            addBananaPoints(2);
+        }
+
+        function translatePhrase(phrase) {
+            const translation = phrases[phrase];
+            document.getElementById('phraseResult').innerHTML = translation.back + '<br><small style="font-size: 0.9rem; font-weight: normal;">' + translation.note + '</small>';
+            addBananaPoints(1);
+        }
+
+        function newChallengeWord() {
+            currentChallengeWord = challengeWords[Math.floor(Math.random() * challengeWords.length)];
+            document.getElementById('challengeWord').textContent = currentChallengeWord.split('').reverse().join('');
+            document.getElementById('guessInput').value = '';
+            document.getElementById('challengeResult').textContent = '';
+        }
+
+        function submitGuess() {
+            const guess = document.getElementById('guessInput').value.toUpperCase().trim();
+            if (!guess || !currentChallengeWord) return;
+
+            if (guess === currentChallengeWord) {
+                challengeScore++;
+                document.getElementById('challengeResult').innerHTML = '<span style="color: green;">✓ CORRECT! The word was ' + currentChallengeWord + '!</span>';
+                document.getElementById('challengeScore').textContent = challengeScore;
+                localStorage.setItem('backwardsScore', challengeScore);
+                addBananaPoints(3);
+
+                if (challengeScore >= 10) {
+                    document.getElementById('masterBadge').classList.add('show');
+                }
+            } else {
+                document.getElementById('challengeResult').innerHTML = '<span style="color: red;">✗ Not quite! Try again or click Reveal!</span>';
+            }
+        }
+
+        function revealAnswer() {
+            if (!currentChallengeWord) return;
+            document.getElementById('challengeResult').innerHTML = '<span style="color: blue;">The word was: ' + currentChallengeWord + '</span>';
+        }
+
+        function newBackwardsFact() {
+            const fact = backwardsFacts[Math.floor(Math.random() * backwardsFacts.length)];
+            document.getElementById('backwardsFact').textContent = fact;
+            addBananaPoints(1);
+        }
+
+        function flipUpsideDown() {
+            isUpsideDown = !isUpsideDown;
+            document.body.classList.toggle('upside-down', isUpsideDown);
+            addBananaPoints(2);
+        }
+
+        // Initialize
+        newChallengeWord();
+        newBackwardsFact();
+
+        // Enter key for guess
+        document.getElementById('guessInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitGuess();
+        });
+    </script>
+</body>
+</html>

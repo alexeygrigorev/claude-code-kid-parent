@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔮 The Judgy Crystal Ball 🔮</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0a0a1a 0%, #1a0a2e 50%, #0a1a2e 100%);
+            color: #e0d0ff;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            color: #b088ff;
+            text-shadow: 0 0 20px #8844ff, 0 0 40px #6622ff;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-style: italic;
+            color: #8866cc;
+            margin-bottom: 30px;
+        }
+
+        .crystal-ball-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .crystal-ball {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #cc99ff 0%, #8844ff 30%, #4422aa 60%, #221155 100%);
+            box-shadow: 0 0 60px #8844ff, 0 0 100px #6622cc, inset 0 0 40px rgba(255, 255, 255, 0.3);
+            animation: float 3s ease-in-out infinite, glow 2s ease-in-out infinite alternate;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+            transition: all 1s ease;
+        }
+
+        .crystal-ball.golden {
+            background: radial-gradient(circle at 30% 30%, #ffdd88 0%, #ffaa33 30%, #cc7722 60%, #884411 100%);
+            box-shadow: 0 0 60px #ffaa33, 0 0 100px #ff8800, inset 0 0 40px rgba(255, 255, 255, 0.4);
+        }
+
+        .crystal-ball.golden .orb-emoji {
+            filter: drop-shadow(0 0 10px gold);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 60px #8844ff, 0 0 100px #6622cc, inset 0 0 40px rgba(255, 255, 255, 0.3); }
+            100% { box-shadow: 0 0 80px #aa66ff, 0 0 120px #8844ee, inset 0 0 50px rgba(255, 255, 255, 0.4); }
+        }
+
+        .stand {
+            width: 120px;
+            height: 40px;
+            background: linear-gradient(180deg, #665588 0%, #443366 100%);
+            margin: -10px auto 0;
+            border-radius: 0 0 60px 60px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-section {
+            background: rgba(60, 20, 100, 0.5);
+            border: 2px solid #8844ff;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .input-section label {
+            display: block;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            padding: 15px;
+            font-size: 1rem;
+            font-family: 'Georgia', serif;
+            background: rgba(20, 10, 40, 0.8);
+            border: 2px solid #6633cc;
+            border-radius: 10px;
+            color: #e0d0ff;
+            resize: none;
+            margin-bottom: 15px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #aa77ff;
+            box-shadow: 0 0 15px rgba(136, 68, 255, 0.5);
+        }
+
+        button {
+            background: linear-gradient(180deg, #8844ff 0%, #6622cc 100%);
+            color: white;
+            border: 2px solid #aa77ff;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-family: 'Georgia', serif;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(180deg, #aa66ff 0%, #8844ff 100%);
+            box-shadow: 0 0 20px rgba(136, 68, 255, 0.7);
+            transform: scale(1.05);
+        }
+
+        .sound-effect {
+            text-align: center;
+            font-style: italic;
+            color: #aa88ff;
+            margin: 15px 0;
+            min-height: 25px;
+            letter-spacing: 2px;
+        }
+
+        .judgment {
+            background: rgba(60, 20, 100, 0.7);
+            border: 2px solid #aa77ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .judgment-text {
+            font-size: 1.3rem;
+            line-height: 1.6;
+        }
+
+        .wisdom-section {
+            background: rgba(60, 20, 100, 0.5);
+            border: 2px solid #8844ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .wisdom-points {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #ffdd88;
+            margin-bottom: 10px;
+        }
+
+        .oracle-title {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #ffaa33;
+            display: none;
+        }
+
+        .oracle-title.show {
+            display: block;
+            animation: shimmer 1s ease infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .history {
+            background: rgba(60, 20, 100, 0.5);
+            border: 2px solid #8844ff;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .history h3 {
+            text-align: center;
+            color: #b088ff;
+            margin-bottom: 15px;
+        }
+
+        .history-item {
+            background: rgba(40, 15, 70, 0.7);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .history-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .history-activity {
+            color: #c0a0ff;
+            font-style: italic;
+        }
+
+        .history-judgment {
+            color: #ffdd88;
+            margin-top: 5px;
+        }
+
+        @keyframes sparkles {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.5); }
+        }
+
+        .sparkle {
+            animation: sparkles 0.5s ease infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+
+    <div class="container">
+        <h1>🔮 THE JUDGY CRYSTAL BALL 🔮</h1>
+        <p class="subtitle">Tell me what you did today... and I shall judge your soul!</p>
+
+        <div class="crystal-ball-container">
+            <div class="crystal-ball" id="crystalBall">
+                <span class="orb-emoji">🔮</span>
+            </div>
+        </div>
+        <div class="stand"></div>
+
+        <div class="input-section">
+            <label>TELL ME WHAT YOU DID TODAY...</label>
+            <textarea id="activityInput" placeholder="I went to school, played games, ate pizza..."></textarea>
+            <button onclick="consultOrb()">CONSULT THE ORB</button>
+        </div>
+
+        <div class="sound-effect" id="soundEffect"></div>
+
+        <div class="judgment" id="judgment">
+            <span class="judgment-text">The orb awaits your confession...</span>
+        </div>
+
+        <div class="wisdom-section">
+            <div class="wisdom-points">✨ Wisdom Points: <span id="wisdomCount">0</span>/50 ✨</div>
+            <div class="oracle-title" id="oracleTitle">
+                👑 ORACLE APPRENTICE 👑<br>
+                <small style="font-size: 0.9rem;">You have transcended mortal wisdom!</small>
+            </div>
+        </div>
+
+        <div class="history">
+            <h3>📜 JUDGMENT HISTORY 📜</h3>
+            <div id="historyList">
+                <p style="text-align: center; color: #8866cc; font-style: italic;">No judgments yet...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let wisdomPoints = parseInt(localStorage.getItem('wisdomPoints')) || 0;
+        let history = JSON.parse(localStorage.getItem('judgmentHistory')) || [];
+
+        document.getElementById('wisdomCount').textContent = wisdomPoints;
+
+        if (wisdomPoints >= 50) {
+            document.getElementById('crystalBall').classList.add('golden');
+            document.getElementById('oracleTitle').classList.add('show');
+        }
+
+        updateHistoryDisplay();
+
+        // Create stars
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.width = star.style.height = (Math.random() * 3 + 1) + 'px';
+            star.style.animationDelay = Math.random() * 2 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        const judgments = {
+            school: {
+                keywords: ['school', 'homework', 'studied', 'learned', 'studying', 'class', 'lesson', 'math', 'reading', 'science', 'history'],
+                text: '✨ WISE ONE! Your brain grows like a mighty oak! The seeds of knowledge you plant today shall become the forest of wisdom tomorrow! ✨',
+                points: 10,
+                sound: '*C R Y S T A L   H U M S   W I T H   A P P R O V A L*',
+                emoji: '📚'
+            },
+            games: {
+                keywords: ['played', 'game', 'fun', 'video games', 'videogame', 'gaming', 'gamed', 'play'],
+                text: '🎮 BALANCE SEEKER! Fun is good but... did you do your chores? The scales of life tip between duty and delight! 🎮',
+                points: 3,
+                sound: '*O R B   Q U E S T I O N S   Y O U R   P R I O R I T I E S*',
+                emoji: '🎮'
+            },
+            food: {
+                keywords: ['ate', 'food', 'lunch', 'dinner', 'snack', 'breakfast', 'dining', 'meal', 'supper', 'ate'],
+                text: '🍕 FUEL CONSUMER! All living things must feast! Your body is a temple and you have made an offering! 🍕',
+                points: 2,
+                sound: '*T H E   O R B   S E N S E S   N O U R I S H M E N T*',
+                emoji: '🍽️'
+            },
+            sleep: {
+                keywords: ['slept', 'nap', 'bed', 'tired', 'resting', 'rested', 'sleepy', 'sleep'],
+                text: '😴 DREAM WALKER! The pillow beckons to all weary souls! May your dreams be sweet and your rest rejuvenating! 😴',
+                points: 2,
+                sound: '*M Y S T I C A L   D R E A M   V I B E S   F L O W*',
+                emoji: '💤'
+            },
+            exercise: {
+                keywords: ['exercise', 'run', 'sport', 'outside', 'worked out', 'workout', 'jogging', 'jog', 'swimming', 'swim', 'basketball', 'soccer', 'tennis'],
+                text: '🏃 BODY WARRIOR! Your muscles sing songs of power! The flesh grows strong through noble exertion! 🏃',
+                points: 8,
+                sound: '*V I T A L I T Y   E N E R G Y   P U L S E S   T H R O U G H   T H E   O R B*',
+                emoji: '💪'
+            },
+            chores: {
+                keywords: ['cleaned', 'chores', 'washed', 'helped', 'cleaning', 'dishes', 'laundry', 'sweep', 'vacuum', 'mopped'],
+                text: '🧹 HERO OF THE HOME! Your deeds shall be remembered! The spirits of domestic harmony smile upon you! 🧹',
+                points: 7,
+                sound: '*T H E   O R B   R A D I A T E S   D O M E S T I C   B L E S S I N G S*',
+                emoji: '🏠'
+            },
+            nothing: {
+                keywords: ['nothing', 'boring', 'idk', 'dont know', "don't know", 'whatever'],
+                text: '🤔 THE VOID STARES BACK! Even nothing is something! In emptiness, there is potential! In boredom, imagination blooms! 🤔',
+                points: 1,
+                sound: '*T H E   V O I D   W H I S P E R S   A N C I E N T   S E C R E T S*',
+                emoji: '🕳️'
+            }
+        };
+
+        const defaultJudgment = {
+            text: '🌈 MYSTIC ONE! Your path is shrouded in mystery! The orb cannot fully comprehend your tale, yet wisdom may still be found! 🌈',
+            points: 5,
+            sound: '*P R O P H E C Y   V I B E S   I N T E N S I F Y*',
+            emoji: '🌈'
+        };
+
+        function consultOrb() {
+            const input = document.getElementById('activityInput').value.trim().toLowerCase();
+
+            if (!input) {
+                document.getElementById('soundEffect').textContent = '*T H E   O R B   W A I T S   F O R   Y O U R   W O R D S*';
+                document.getElementById('judgment').innerHTML = '<span class="judgment-text">You must speak, mortal! The orb cannot judge silence!</span>';
+                return;
+            }
+
+            // Find matching judgment
+            let matchedJudgment = null;
+            for (const [key, judgment] of Object.entries(judgments)) {
+                if (judgment.keywords.some(keyword => input.includes(keyword))) {
+                    matchedJudgment = judgment;
+                    break;
+                }
+            }
+
+            const result = matchedJudgment || defaultJudgment;
+
+            // Display sound effect
+            document.getElementById('soundEffect').textContent = result.sound;
+
+            // Display judgment
+            document.getElementById('judgment').innerHTML = `<span class="judgment-text sparkle">${result.text}</span>`;
+
+            // Update wisdom points
+            wisdomPoints += result.points;
+            if (wisdomPoints > 999) wisdomPoints = 999;
+            localStorage.setItem('wisdomPoints', wisdomPoints);
+            document.getElementById('wisdomCount').textContent = wisdomPoints;
+
+            // Check for oracle title
+            if (wisdomPoints >= 50) {
+                document.getElementById('crystalBall').classList.add('golden');
+                document.getElementById('oracleTitle').classList.add('show');
+            }
+
+            // Add to history
+            const activityShort = document.getElementById('activityInput').value.substring(0, 50) + (document.getElementById('activityInput').value.length > 50 ? '...' : '');
+            history.unshift({
+                activity: activityShort,
+                judgment: result.emoji + ' ' + result.text.substring(0, 60) + '...',
+                timestamp: new Date().toLocaleTimeString()
+            });
+
+            // Keep only last 5
+            history = history.slice(0, 5);
+            localStorage.setItem('judgmentHistory', JSON.stringify(history));
+            updateHistoryDisplay();
+
+            // Clear input
+            document.getElementById('activityInput').value = '';
+        }
+
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+
+            if (history.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; color: #8866cc; font-style: italic;">No judgments yet...</p>';
+                return;
+            }
+
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item">
+                    <div class="history-activity">"${item.activity}"</div>
+                    <div class="history-judgment">${item.judgment}</div>
+                </div>
+            `).join('');
+        }
+
+        // Allow Enter key to submit (with Ctrl/Cmd)
+        document.getElementById('activityInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                consultOrb();
+            }
+        });
+    </script>
+</body>
+</html>

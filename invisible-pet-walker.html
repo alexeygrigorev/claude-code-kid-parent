@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👻 Invisible Pet Walker Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #6366f1;
+            text-shadow: 2px 2px 0 #fff;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .pet-card {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            display: none;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .pet-card.show {
+            display: block;
+        }
+
+        .pet-emoji {
+            font-size: 5rem;
+            margin-bottom: 15px;
+            animation: wiggle 0.5s ease infinite;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        .pet-name {
+            font-size: 1.8rem;
+            color: #6366f1;
+            margin-bottom: 10px;
+        }
+
+        .pet-trait {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 1.1rem;
+            margin: 10px 0;
+        }
+
+        .trait-desc {
+            color: #666;
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+
+        .btn {
+            font-size: 1.3rem;
+            padding: 15px 35px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Comic Sans MS', cursive;
+            transition: transform 0.1s, box-shadow 0.1s;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 5px 0 #5a4a7a;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #5a4a7a;
+        }
+
+        .btn-start:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #5a4a7a;
+        }
+
+        .btn-step {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            box-shadow: 0 5px 0 #0d7a6f;
+        }
+
+        .btn-step:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #0d7a6f;
+        }
+
+        .btn-step:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #0d7a6f;
+        }
+
+        .step-counter {
+            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+            padding: 15px 25px;
+            border-radius: 50px;
+            display: inline-block;
+            font-size: 1.2rem;
+            margin: 15px 0;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .event-log {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 15px 0;
+            min-height: 150px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .event {
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 12px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            0% { transform: translateX(-20px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+        .event-action {
+            background: #e0f7fa;
+            border-left: 4px solid #00bcd4;
+        }
+
+        .event-person {
+            background: #fce4ec;
+            border-left: 4px solid #e91e63;
+        }
+
+        .event-embarrassing {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+
+        .meters {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .meter {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            min-width: 140px;
+        }
+
+        .meter-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .meter-bar {
+            height: 20px;
+            background: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .meter-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .awkward-fill { background: linear-gradient(90deg, #ffeb3b, #ff9800, #f44336); }
+        .belief-fill { background: linear-gradient(90deg, #e91e63, #9c27b0, #3f51b5); }
+
+        .rating-screen {
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            display: none;
+            animation: popIn 0.5s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .rating-screen.show {
+            display: block;
+        }
+
+        .rating-stars {
+            font-size: 3rem;
+            margin: 15px 0;
+        }
+
+        .rating-title {
+            font-size: 1.8rem;
+            color: #6366f1;
+            margin-bottom: 10px;
+        }
+
+        .rating-desc {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .stats-summary {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        .invisible {
+            display: none;
+        }
+
+        .person-bubble {
+            position: fixed;
+            font-size: 2rem;
+            pointer-events: none;
+            animation: floatAway 2s ease-out forwards;
+        }
+
+        @keyframes floatAway {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-100px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👻 Invisible Pet Walker Simulator</h1>
+        <p class="subtitle">Walk your invisible pet in public... if you dare!</p>
+
+        <div id="startScreen">
+            <button class="btn btn-start" onclick="getPet()">Get Your Invisible Pet!</button>
+        </div>
+
+        <div class="pet-card" id="petCard">
+            <div class="pet-emoji" id="petEmoji"></div>
+            <div class="pet-name" id="petName"></div>
+            <div class="pet-trait" id="petTrait"></div>
+            <p class="trait-desc" id="traitDesc"></p>
+        </div>
+
+        <div class="invisible" id="gameArea">
+            <div class="step-counter">
+                Steps: <span id="stepCount">0</span>/20
+            </div>
+
+            <div class="meters">
+                <div class="meter">
+                    <div class="meter-label">😳 Awkward Meter</div>
+                    <div class="meter-bar">
+                        <div class="meter-fill awkward-fill" id="awkwardMeter" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="meter">
+                    <div class="meter-label">✨ Belief Meter</div>
+                    <div class="meter-bar">
+                        <div class="meter-fill belief-fill" id="beliefMeter" style="width: 50%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-step" id="stepBtn" onclick="takeStep()">Take a Step 🐾</button>
+
+            <div class="event-log" id="eventLog">
+                <p style="color: #999; font-style: italic;">Your journey begins...</p>
+            </div>
+        </div>
+
+        <div class="rating-screen" id="ratingScreen">
+            <div class="rating-stars" id="ratingStars"></div>
+            <div class="rating-title" id="ratingTitle"></div>
+            <p class="rating-desc" id="ratingDesc"></p>
+            <div class="stats-summary" id="statsSummary"></div>
+            <button class="btn btn-start" onclick="location.reload()">Walk Another Pet!</button>
+        </div>
+    </div>
+
+    <script>
+        const pets = [
+            { emoji: "🐹👻", name: "Ghost Hamster", trait: "ZOOMY", desc: "Runs in invisible circles at light speed!" },
+            { emoji: "☁️🐋", name: "Cloud Whale", trait: "DRAMATIC", desc: "Floats dramatically and sighs a lot." },
+            { emoji: "🐍🌑", name: "Shadow Snake", trait: "SNUFFLY", desc: "Sniffs every single shadow you pass." },
+            { emoji: "🌬️🐉", name: "Breeze Dragon", trait: "CHAOTIC", desc: "Does random things. Nobody knows why." },
+            { emoji: "😾🌫️", name: "Whisper Cat", trait: "DRAMATIC", desc: "Judges everyone silently." },
+            { emoji: "✨🐢", name: "Sparkle Turtle", trait: "SNUFFLY", desc: "Moves slowly but sparkles a lot." },
+            { emoji: "🦊🔮", name: "Phantom Fox", trait: "CHAOTIC", desc: "Chases invisible butterflies constantly." },
+            { emoji: "🐙💜", name: "Void Octopus", trait: "ZOOMY", desc: "Splats against invisible walls." }
+        ];
+
+        const actions = {
+            ZOOMY: [
+                "{pet} ZOOMED around you in 50 circles!",
+                "{pet} did a backflip and knocked over nothing!",
+                "{pet} sprinted after an invisible squirrel!",
+                "{pet} is running so fast their leash is smoking!",
+                "{pet} did three barrel rolls in mid-air!"
+            ],
+            SNUFFLY: [
+                "{pet} stopped to sniff that lamp post for 30 seconds...",
+                "{pet} is fascinated by an invisible rock!",
+                "{pet} found something VERY interesting in the air!",
+                "{pet} is sniffing a stranger's shoe... awkward!",
+                "{pet} thinks that patch of grass smells amazing!"
+            ],
+            DRAMATIC: [
+                "{pet} flopped over dramatically and sighed...",
+                "{pet} is giving you the silent treatment.",
+                "{pet} posed like a superhero for no reason!",
+                "{pet} is judging your walking technique...",
+                "{pet} had a dramatic reaction to a leaf!"
+            ],
+            CHAOTIC: [
+                "{pet} suddenly decided to walk sideways!",
+                "{pet} is chasing NOTHING in circles!",
+                "{pet} stopped and stared at NOTHING intensely!",
+                "{pet} made a break for it! (they're still on the leash)",
+                "{pet} is doing... something? Nobody knows!"
+            ]
+        };
+
+        const people = [
+            { text: ""Why are you holding a leash to nothing?"", nice: false },
+            { text: ""Aww, is that a ghost hamster? So cute!"", nice: true },
+            { text: ""I believe you! My grandma had one too!"", nice: true },
+            { text: ""Weirdo..."", nice: false },
+            { text: ""That's the coolest thing I've ever seen!"", nice: true },
+            { text: ""Should I call the doctor for you?"", nice: false },
+            { text: ""OMG look at the little whiskers!"", nice: true },
+            { text: ""Are you... okay?"", nice: false },
+            { text: ""I totally see it! It's beautiful!"", nice: true },
+            { text: ""That's not a real pet, you know."", nice: false },
+            { text: ""Can I pet it? Oh wait, never mind..."", nice: true },
+            { text: ""You need help, seriously."", nice: false }
+        ];
+
+        const embarrassing = [
+            "{pet} got tangled around your legs!",
+            "{pet} 'barked' and everyone stared!",
+            "{pet} tripped an old man! (He's confused)",
+            "{pet} knocked over a display of apples!",
+            "{pet} humped someone's leg! (So awkward!)",
+            "{pet} decided to 'mark' a fire hydrant!",
+            "{pet} chased a real dog! The dog is scared!",
+            "{pet} ate someone's sandwich! They're confused!",
+            "{pet} got excited and... oh no... yellow puddle...",
+            "{pet} started floating and kids are screaming!"
+        ];
+
+        let currentPet = null;
+        let steps = 0;
+        const maxSteps = 20;
+        let awkwardLevel = 0;
+        let beliefLevel = 50;
+
+        function getPet() {
+            currentPet = pets[Math.floor(Math.random() * pets.length)];
+
+            document.getElementById('petEmoji').textContent = currentPet.emoji;
+            document.getElementById('petName').textContent = currentPet.name;
+            document.getElementById('petTrait').textContent = currentPet.trait;
+            document.getElementById('traitDesc').textContent = currentPet.desc;
+            document.getElementById('petCard').classList.add('show');
+            document.getElementById('startScreen').classList.add('invisible');
+            document.getElementById('gameArea').classList.remove('invisible');
+
+            addEvent(`You got a ${currentPet.name}! Time for a walk!`, 'event-action');
+        }
+
+        function addEvent(text, type) {
+            const log = document.getElementById('eventLog');
+            const event = document.createElement('div');
+            event.className = `event ${type}`;
+            event.textContent = text;
+            log.insertBefore(event, log.firstChild.nextSibling);
+
+            // Keep only 10 events
+            while (log.children.length > 11) {
+                log.removeChild(log.lastChild);
+            }
+        }
+
+        function updateMeters() {
+            document.getElementById('awkwardMeter').style.width = awkwardLevel + '%';
+            document.getElementById('beliefMeter').style.width = beliefLevel + '%';
+        }
+
+        function takeStep() {
+            if (steps >= maxSteps) return;
+
+            steps++;
+            document.getElementById('stepCount').textContent = steps;
+
+            const petName = currentPet.name;
+
+            // 60% normal action, 25% person reaction, 15% embarrassing
+            const roll = Math.random();
+
+            if (roll < 0.6) {
+                // Normal action based on trait
+                const traitActions = actions[currentPet.trait];
+                const action = traitActions[Math.floor(Math.random() * traitActions.length)];
+                addEvent(action.replace('{pet}', petName), 'event-action');
+            } else if (roll < 0.85) {
+                // Person reaction
+                const person = people[Math.floor(Math.random() * people.length)];
+                addEvent(`👤 Someone: ${person.text}`, 'event-person');
+                if (person.nice) {
+                    beliefLevel = Math.min(100, beliefLevel + 10);
+                    awkwardLevel = Math.max(0, awkwardLevel - 5);
+                } else {
+                    beliefLevel = Math.max(0, beliefLevel - 10);
+                    awkwardLevel = Math.min(100, awkwardLevel + 15);
+                }
+            } else {
+                // Embarrassing moment!
+                const emb = embarrassing[Math.floor(Math.random() * embarrassing.length)];
+                addEvent(`😱 ${emb.replace('{pet}', petName)}`, 'event-embarrassing');
+                awkwardLevel = Math.min(100, awkwardLevel + 25);
+                beliefLevel = Math.max(0, beliefLevel - 5);
+            }
+
+            updateMeters();
+
+            if (steps >= maxSteps) {
+                endWalk();
+            }
+        }
+
+        function endWalk() {
+            document.getElementById('stepBtn').disabled = true;
+            document.getElementById('stepBtn').style.opacity = '0.5';
+
+            setTimeout(() => {
+                document.getElementById('gameArea').classList.add('invisible');
+                document.getElementById('petCard').classList.remove('show');
+                showRating();
+            }, 1500);
+        }
+
+        function showRating() {
+            const ratingScreen = document.getElementById('ratingScreen');
+            const avgScore = (beliefLevel - awkwardLevel / 2);
+
+            let stars, title, desc;
+
+            if (avgScore >= 60) {
+                stars = "⭐⭐⭐⭐⭐";
+                title = "BEST INVISIBLE PET WALKER EVER!";
+                desc = "You and your pet are LEGENDS! Everyone believes in you!";
+            } else if (avgScore >= 30) {
+                stars = "⭐⭐⭐";
+                title = "Your Pet Tolerates You";
+                desc = "Not bad! Your pet didn't run away and some people believed you!";
+            } else if (avgScore >= 0) {
+                stars = "⭐⭐";
+                title = "Your Pet Is Embarrassed";
+                desc = "Your invisible pet is pretending they don't know you...";
+            } else {
+                stars = "⭐";
+                title = "Your Pet Ran Away (Invisibly)";
+                desc = "Your pet has found a new human. One who can actually walk them properly.";
+            }
+
+            document.getElementById('ratingStars').textContent = stars;
+            document.getElementById('ratingTitle').textContent = title;
+            document.getElementById('ratingDesc').textContent = desc;
+            document.getElementById('statsSummary').innerHTML = `
+                <strong>Walk Summary:</strong><br>
+                🐾 Pet: ${currentPet.name}<br>
+                😳 Awkwardness: ${awkwardLevel}%<br>
+                ✨ Public Belief: ${beliefLevel}%<br>
+                🎯 Final Score: ${Math.max(0, Math.floor(avgScore))}/100
+            `;
+
+            ratingScreen.classList.add('show');
+        }
+    </script>
+</body>
+</html>

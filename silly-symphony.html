@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 Silly Symphony Maker 🎵</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-box: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1a1a2e 0%, #2a2a4e 50%, #1a1a2e 100%);
+            color: #e0d0ff;
+            padding: 20px;
+            overflow-x: hidden;
+            transition: background 0.5s;
+        }
+
+        body.concert-mode {
+            background: linear-gradient(180deg, #2a1a0a 0%, #4a2a1a 50%, #2a1a0a 100%);
+        }
+
+        .spotlights {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            display: none;
+        }
+
+        .spotlights.show {
+            display: block;
+        }
+
+        .spotlight {
+            position: absolute;
+            width: 200px;
+            height: 400px;
+            background: linear-gradient(180deg, rgba(255, 255, 0, 0.3) 0%, transparent 100%);
+            clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #ff69b4;
+            text-shadow: 3px 3px 0 #8844ff, 0 0 20px #ff69b4;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #aa88cc;
+            margin-bottom: 20px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            color: #ffcc00;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #cc99ff;
+        }
+
+        .badge {
+            display: none;
+            background: linear-gradient(135deg, #ff69b4, #9944dd);
+            color: white;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: badgeGlow 1s infinite;
+        }
+
+        .badge.show {
+            display: block;
+        }
+
+        @keyframes badgeGlow {
+            0%, 100% { box-shadow: 0 0 10px #ff69b4; }
+            50% { box-shadow: 0 0 30px #ff69b4; }
+        }
+
+        .stage {
+            background: linear-gradient(180deg, #332244 0%, #221133 100%);
+            border: 4px solid #8844ff;
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .stage::before {
+            content: '🎵 THE SILLY STAGE 🎵';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff69b4;
+            color: white;
+            padding: 5px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .instruments {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .instruments { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .instrument {
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid;
+            border-radius: 20px;
+            padding: 20px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            user-select: none;
+        }
+
+        .instrument:hover {
+            transform: scale(1.1);
+        }
+
+        .instrument.playing {
+            animation: instrumentPlay 0.5s ease;
+        }
+
+        @keyframes instrumentPlay {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3) rotate(10deg); }
+        }
+
+        .instrument-emoji {
+            font-size: 3rem;
+            display: block;
+        }
+
+        .instrument-name {
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+
+        .sound-effect {
+            min-height: 30px;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 15px;
+            font-size: 1rem;
+            font-family: 'Comic Sans MS', cursive;
+            cursor: pointer;
+            border: none;
+            border-radius: 15px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .record-btn { background: linear-gradient(180deg, #ff4444, #cc2222); color: white; }
+        .stop-btn { background: linear-gradient(180deg, #666, #444); color: white; }
+        .play-btn { background: linear-gradient(180deg, #44ff44, #22cc22); color: #333; }
+        .concert-btn { background: linear-gradient(180deg, #ffaa00, #cc8800); color: white; }
+
+        .control-btn:hover { transform: scale(1.05); }
+
+        .control-btn.active { box-shadow: 0 0 20px currentColor; }
+
+        .silly-modes {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            padding: 12px;
+            font-size: 0.9rem;
+            font-family: 'Comic Sans MS', cursive;
+            cursor: pointer;
+            border: 2px solid;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .mode-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        .mode-btn.active { background: rgba(255, 255, 0, 0.3); box-shadow: 0 0 15px yellow; }
+
+        .sheet-music {
+            background: #ffffee;
+            border: 4px solid #8844ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: #333;
+            min-height: 100px;
+        }
+
+        .sheet-music h4 {
+            text-align: center;
+            color: #8844ff;
+            margin-bottom: 10px;
+        }
+
+        .music-staff {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            min-height: 60px;
+        }
+
+        .staff-line {
+            width: 100%;
+            height: 2px;
+            background: #333;
+            margin: 8px 0;
+        }
+
+        .note {
+            font-size: 2rem;
+            animation: notePop 0.5s ease;
+        }
+
+        @keyframes notePop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .song-list {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .song-list h4 {
+            text-align: center;
+            color: #cc99ff;
+            margin-bottom: 15px;
+        }
+
+        .song-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .song-info {
+            flex: 1;
+        }
+
+        .song-name {
+            font-weight: bold;
+            color: #ffcc00;
+        }
+
+        .song-notes {
+            font-size: 0.8rem;
+            color: #cc99ff;
+        }
+
+        .song-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .song-btn {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            background: #8844ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .song-btn:hover { background: #aa66ff; }
+
+        .song-btn.delete { background: #ff4444; }
+
+        .applause-meter {
+            text-align: center;
+            display: none;
+        }
+
+        .applause-meter.show {
+            display: block;
+        }
+
+        .applause-bar {
+            height: 30px;
+            background: #333;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .applause-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6600, #ffcc00);
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .audience {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            display: none;
+            justify-content: space-around;
+            align-items: flex-end;
+            padding-bottom: 20px;
+            pointer-events: none;
+        }
+
+        .audience.show {
+            display: flex;
+        }
+
+        .audience-emoji {
+            font-size: 3rem;
+            animation: audienceBounce 0.5s ease infinite;
+        }
+
+        @keyframes audienceBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .recording-indicator {
+            display: none;
+            text-align: center;
+            color: #ff4444;
+            font-weight: bold;
+            animation: blink 1s infinite;
+        }
+
+        .recording-indicator.show {
+            display: block;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="spotlights" id="spotlights">
+        <div class="spotlight" style="left: 10%;"></div>
+        <div class="spotlight" style="left: 50%;"></div>
+        <div class="spotlight" style="right: 10%;"></div>
+    </div>
+
+    <div class="audience" id="audience">
+        <span class="audience-emoji">👏</span>
+        <span class="audience-emoji">🎉</span>
+        <span class="audience-emoji">👏</span>
+        <span class="audience-emoji">🎉</span>
+        <span class="audience-emoji">👏</span>
+    </div>
+
+    <div class="container">
+        <h1>🎵 SILLY SYMPHONY MAKER 🎵</h1>
+        <p class="subtitle">Make music with SILLY animal sounds!</p>
+
+        <div class="badge" id="bandLeaderBadge">
+            🎵 BAND LEADER BADGE! 🎵<br>
+            You've created 5 masterpieces!
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-value" id="totalNotes">0</div>
+                <div class="stat-label">Total Notes Played</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="songsSaved">0</div>
+                <div class="stat-label">Songs Saved</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="applauseScore">0%</div>
+                <div class="stat-label">Applause Rating</div>
+            </div>
+        </div>
+
+        <div class="stage">
+            <div class="sound-effect" id="soundEffect"></div>
+
+            <div class="instruments">
+                <div class="instrument" style="border-color: #44ff88;" data-instrument="frog" onclick="playInstrument('frog')">
+                    <span class="instrument-emoji">🐸</span>
+                    <div class="instrument-name">Burping Frog</div>
+                </div>
+                <div class="instrument" style="border-color: #ff8844;" data-instrument="bear" onclick="playInstrument('bear')">
+                    <span class="instrument-emoji">🐻</span>
+                    <div class="instrument-name">Tooting Bear</div>
+                </div>
+                <div class="instrument" style="border-color: #ff44ff;" data-instrument="cat" onclick="playInstrument('cat')">
+                    <span class="instrument-emoji">🐱</span>
+                    <div class="instrument-name">Meowing Cat</div>
+                </div>
+                <div class="instrument" style="border-color: #ffaa44;" data-instrument="dog" onclick="playInstrument('dog')">
+                    <span class="instrument-emoji">🐶</span>
+                    <div class="instrument-name">Barking Dog</div>
+                </div>
+                <div class="instrument" style="border-color: #44aaff;" data-instrument="duck" onclick="playInstrument('duck')">
+                    <span class="instrument-emoji">🦆</span>
+                    <div class="instrument-name">Quacking Duck</div>
+                </div>
+                <div class="instrument" style="border-color: #ffffff;" data-instrument="cow" onclick="playInstrument('cow')">
+                    <span class="instrument-emoji">🐄</span>
+                    <div class="instrument-name">Mooing Cow</div>
+                </div>
+                <div class="instrument" style="border-color: #ffcc44;" data-instrument="chicken" onclick="playInstrument('chicken')">
+                    <span class="instrument-emoji">🐔</span>
+                    <div class="instrument-name">Clucking Chicken</div>
+                </div>
+                <div class="instrument" style="border-color: #ff88cc;" data-instrument="pig" onclick="playInstrument('pig')">
+                    <span class="instrument-emoji">🐷</span>
+                    <div class="instrument-name">Oinking Pig</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn record-btn" id="recordBtn" onclick="toggleRecord()">🔴 RECORD</button>
+            <button class="control-btn stop-btn" onclick="stopAll()">⏹️ STOP</button>
+            <button class="control-btn play-btn" id="playBtn" onclick="playRecording()">▶️ PLAY BACK</button>
+            <button class="control-btn concert-btn" id="concertBtn" onclick="toggleConcert()">🎭 CONCERT HALL</button>
+        </div>
+
+        <div class="recording-indicator" id="recordingIndicator">🔴 RECORDING... 🔴</div>
+
+        <div class="silly-modes">
+            <button class="mode-btn" id="chaosMode" onclick="toggleMode('chaos')">💥 CHAOS MODE</button>
+            <button class="mode-btn" id="slowMode" onclick="toggleMode('slow')">🐌 SLOW MOTION</button>
+            <button class="mode-btn" id="fastMode" onclick="toggleMode('fast')">⚡ SPEEDY MODE</button>
+            <button class="mode-btn" id="echoMode" onclick="toggleMode('echo')">🔊 ECHO MODE</button>
+        </div>
+
+        <div class="sheet-music">
+            <h4>📜 SHEET MUSIC 📜</h4>
+            <div class="music-staff" id="sheetMusic">
+                <div class="staff-line"></div>
+                <div class="staff-line"></div>
+                <div class="staff-line"></div>
+                <div class="staff-line"></div>
+                <div class="staff-line"></div>
+            </div>
+        </div>
+
+        <div class="applause-meter" id="applauseMeter">
+            <div>👏 APPLAUSE METER 👏</div>
+            <div class="applause-bar">
+                <div class="applause-fill" id="applauseFill">0%</div>
+            </div>
+        </div>
+
+        <div class="song-list">
+            <h4>💾 YOUR SONGS 💾</h4>
+            <div id="songList">
+                <p style="text-align: center; color: #6666aa; font-style: italic;">No songs yet! Record and save your first symphony!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Instruments data
+        const instruments = {
+            frog: { emoji: '🐸', sound: 'RIBBIT-BURP!', color: '#44ff88' },
+            bear: { emoji: '🐻', sound: 'TOOT-TOOT!', color: '#ff8844' },
+            cat: { emoji: '🐱', sound: 'MEOW-WOW!', color: '#ff44ff' },
+            dog: { emoji: '🐶', sound: 'WOOF-BARK!', color: '#ffaa44' },
+            duck: { emoji: '🦆', sound: 'QUACK-SQUACK!', color: '#44aaff' },
+            cow: { emoji: '🐄', sound: 'MOOO-LORD!', color: '#ffffff' },
+            chicken: { emoji: '🐔', sound: 'CLUCK-CLUCK!', color: '#ffcc44' },
+            pig: { emoji: '🐷', sound: 'OINK-BOINK!', color: '#ff88cc' }
+        };
+
+        const funnySongNames = [
+            'The Burping Symphony', 'Toccata in F-Major (F for Farts!)', 'Moonlight Sonata (but sillier)',
+            'The Four Tacos', 'Rhapsody in Boop', 'Canon in D (D for Doo-doo!)',
+            'The Nutcracker (but with nuts!)', 'Symphony No. 5 in C-Major (C for Crazy!)',
+            'Cluckin\' Good Time', 'The Oinking Opera', 'Meow-sic of the Night',
+            'Quack Attack', 'Moo-ving Melody', 'Ribbit&Roll', 'Barnyard Boogie'
+        ];
+
+        // State
+        let isRecording = false;
+        let isPlaying = false;
+        let recording = [];
+        let totalNotes = parseInt(localStorage.getItem('totalNotes')) || 0;
+        let songs = JSON.parse(localStorage.getItem('sillySongs')) || [];
+        let currentMode = null;
+        let concertMode = false;
+        let playbackTimeout = null;
+
+        // Update display
+        document.getElementById('totalNotes').textContent = totalNotes;
+        document.getElementById('songsSaved').textContent = songs.length;
+        updateSongList();
+        checkBadge();
+
+        function playInstrument(instrumentKey) {
+            const inst = instruments[instrumentKey];
+            if (!inst) return;
+
+            // Animate instrument
+            const instEl = document.querySelector(`[data-instrument="${instrumentKey}"]`);
+            instEl.classList.add('playing');
+            setTimeout(() => instEl.classList.remove('playing'), 500);
+
+            // Show sound effect
+            let sound = inst.sound;
+            let displaySound = sound;
+
+            // Apply modes
+            if (currentMode === 'slow') {
+                displaySound = sound.split('').join(' ') + '...';
+            } else if (currentMode === 'fast') {
+                displaySound = sound.replace(/!/g, '!!');
+            }
+
+            document.getElementById('soundEffect').textContent = '*' + displaySound + '*';
+
+            // Add to sheet music
+            addNoteToSheet(inst.emoji);
+
+            // Record if recording
+            if (isRecording) {
+                recording.push({ instrument: instrumentKey, time: Date.now() });
+            }
+
+            // Update stats
+            totalNotes++;
+            localStorage.setItem('totalNotes', totalNotes);
+            document.getElementById('totalNotes').textContent = totalNotes;
+
+            // Echo mode
+            if (currentMode === 'echo') {
+                setTimeout(() => {
+                    document.getElementById('soundEffect').textContent = '*' + displaySound + '*';
+                    addNoteToSheet(inst.emoji);
+                }, 300);
+                setTimeout(() => {
+                    document.getElementById('soundEffect').textContent = '*' + displaySound + '*';
+                    addNoteToSheet(inst.emoji);
+                }, 600);
+            }
+
+            // Update applause
+            updateApplause();
+        }
+
+        function addNoteToSheet(emoji) {
+            const staff = document.getElementById('sheetMusic');
+            const note = document.createElement('span');
+            note.className = 'note';
+            note.textContent = emoji;
+            staff.appendChild(note);
+
+            // Limit notes on sheet
+            while (staff.children.length > 20) {
+                staff.removeChild(staff.firstChild);
+                // Keep the staff lines
+            }
+        }
+
+        function clearSheetMusic() {
+            const staff = document.getElementById('sheetMusic');
+            staff.innerHTML = `
+                <div class="staff-line"></div>
+                <div class="staff-line"></div>
+                <div class="staff-line"></div>
+                <div class="staff-line"></div>
+                <div class="staff-line"></div>
+            `;
+        }
+
+        function toggleRecord() {
+            isRecording = !isRecording;
+            const btn = document.getElementById('recordBtn');
+            const indicator = document.getElementById('recordingIndicator');
+
+            if (isRecording) {
+                recording = [];
+                recording.push({ instrument: null, time: Date.now() }); // Start time
+                btn.textContent = '⏹️ STOP & SAVE';
+                btn.classList.add('active');
+                indicator.classList.add('show');
+            } else {
+                // Save recording
+                if (recording.length > 1) {
+                    saveSong(recording);
+                }
+                btn.textContent = '🔴 RECORD';
+                btn.classList.remove('active');
+                indicator.classList.remove('show');
+            }
+        }
+
+        function saveSong(recordedNotes) {
+            if (recordedNotes.length <= 1) return;
+
+            // Clean recording (remove start marker and calculate times)
+            const startTime = recordedNotes[0].time;
+            const notes = recordedNotes.slice(1).map(n => ({
+                instrument: n.instrument,
+                delay: n.time - startTime
+            }));
+
+            const song = {
+                name: funnySongNames[Math.floor(Math.random() * funnySongNames.length)],
+                notes: notes,
+                noteCount: notes.length,
+                date: new Date().toLocaleDateString()
+            };
+
+            songs.unshift(song);
+            songs = songs.slice(0, 5); // Keep only 5 songs
+            localStorage.setItem('sillySongs', JSON.stringify(songs));
+
+            document.getElementById('songsSaved').textContent = songs.length;
+            updateSongList();
+            checkBadge();
+
+            document.getElementById('soundEffect').textContent = '*SONG SAVED!*';
+        }
+
+        function updateSongList() {
+            const list = document.getElementById('songList');
+
+            if (songs.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #6666aa; font-style: italic;">No songs yet! Record and save your first symphony!</p>';
+                return;
+            }
+
+            list.innerHTML = songs.map((song, index) => `
+                <div class="song-item">
+                    <div class="song-info">
+                        <div class="song-name">🎵 ${song.name}</div>
+                        <div class="song-notes">${song.noteCount} notes • ${song.date}</div>
+                    </div>
+                    <div class="song-actions">
+                        <button class="song-btn" onclick="playSong(${index})">▶️ Play</button>
+                        <button class="song-btn delete" onclick="deleteSong(${index})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function playSong(index) {
+            const song = songs[index];
+            if (!song || isPlaying) return;
+
+            isPlaying = true;
+            clearSheetMusic();
+            enableConcertEffects();
+
+            const maxDelay = Math.max(...song.notes.map(n => n.delay));
+            const applausePercent = Math.min(100, Math.floor(song.noteCount / 2));
+
+            document.getElementById('applauseMeter').classList.add('show');
+            document.getElementById('applauseFill').style.width = applausePercent + '%';
+            document.getElementById('applauseFill').textContent = applausePercent + '%';
+            document.getElementById('applauseScore').textContent = applausePercent + '%';
+
+            song.notes.forEach(note => {
+                const timeout = setTimeout(() => {
+                    playInstrument(note.instrument);
+                }, note.delay);
+                playbackTimeout = timeout;
+            });
+
+            // End playback
+            const endTimeout = setTimeout(() => {
+                isPlaying = false;
+                disableConcertEffects();
+            }, maxDelay + 1000);
+        }
+
+        function playRecording() {
+            if (recording.length <= 1) {
+                document.getElementById('soundEffect').textContent = '*No recording!*';
+                return;
+            }
+
+            const startTime = recording[0].time;
+            const notes = recording.slice(1).map(n => ({
+                instrument: n.instrument,
+                delay: n.time - startTime
+            }));
+
+            const fakeSong = { notes: notes };
+            playSong({ notes: notes });
+        }
+
+        function deleteSong(index) {
+            songs.splice(index, 1);
+            localStorage.setItem('sillySongs', JSON.stringify(songs));
+            document.getElementById('songsSaved').textContent = songs.length;
+            updateSongList();
+            checkBadge();
+        }
+
+        function stopAll() {
+            isRecording = false;
+            isPlaying = false;
+            recording = [];
+
+            document.getElementById('recordBtn').textContent = '🔴 RECORD';
+            document.getElementById('recordBtn').classList.remove('active');
+            document.getElementById('recordingIndicator').classList.remove('show');
+
+            if (playbackTimeout) {
+                clearTimeout(playbackTimeout);
+            }
+
+            disableConcertEffects();
+        }
+
+        function toggleMode(mode) {
+            const btn = document.getElementById(mode + 'Mode');
+
+            if (currentMode === mode) {
+                currentMode = null;
+                btn.classList.remove('active');
+            } else {
+                // Remove other modes
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                currentMode = mode;
+                btn.classList.add('active');
+            }
+        }
+
+        function toggleConcert() {
+            concertMode = !concertMode;
+            const btn = document.getElementById('concertBtn');
+
+            if (concertMode) {
+                btn.classList.add('active');
+                document.body.classList.add('concert-mode');
+                document.getElementById('spotlights').classList.add('show');
+            } else {
+                btn.classList.remove('active');
+                document.body.classList.remove('concert-mode');
+                document.getElementById('spotlights').classList.remove('show');
+                document.getElementById('audience').classList.remove('show');
+            }
+        }
+
+        function enableConcertEffects() {
+            document.getElementById('spotlights').classList.add('show');
+            document.getElementById('audience').classList.add('show');
+        }
+
+        function disableConcertEffects() {
+            if (!concertMode) {
+                document.getElementById('spotlights').classList.remove('show');
+            }
+            document.getElementById('audience').classList.remove('show');
+            setTimeout(() => {
+                if (!isPlaying) {
+                    document.getElementById('applauseMeter').classList.remove('show');
+                }
+            }, 2000);
+        }
+
+        function updateApplause() {
+            const applause = Math.min(100, Math.floor(totalNotes / 10));
+            document.getElementById('applauseScore').textContent = applause + '%';
+        }
+
+        function checkBadge() {
+            const badge = document.getElementById('bandLeaderBadge');
+            if (songs.length >= 5) {
+                badge.classList.add('show');
+            } else {
+                badge.classList.remove('show');
+            }
+        }
+
+        // Chaos mode - random instruments
+        setInterval(() => {
+            if (currentMode === 'chaos' && Math.random() < 0.1) {
+                const keys = Object.keys(instruments);
+                const randomKey = keys[Math.floor(Math.random() * keys.length)];
+                playInstrument(randomKey);
+            }
+        }, 500);
+
+        // Initial applause update
+        updateApplause();
+    </script>
+</body>
+</html>

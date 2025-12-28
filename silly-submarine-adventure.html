@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌊 Silly Submarine Adventure 🌊</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-box: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(180deg, #001a33 0%, #003366 50%, #001a33 100%);
+            color: #e0f0ff;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Ocean with waves */
+        .ocean {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #006994 0%, #003366 50%, #001a33 100%);
+            overflow: hidden;
+        }
+
+        .waves {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 100px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 L1200,120 L0,120 Z" fill="%2388ccff" opacity="0.3"/></svg>');
+            background-size: 50% 100%;
+            animation: waveMove 10s linear infinite;
+        }
+
+        @keyframes waveMove {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        /* Submarine */
+        .submarine {
+            position: absolute;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: transform 0.1s;
+            z-index: 100;
+        }
+
+        .submarine.going-up { transform: rotate(-10deg); }
+        .submarine.going-down { transform: rotate(10deg); }
+        .submarine.going-left { transform: scaleX(-1); }
+
+        .periscope-view {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 50px;
+            border: 3px solid #88ccff;
+            border-bottom: none;
+            border-radius: 50px 50px 0 0;
+            background: linear-gradient(180deg, rgba(136, 204, 255, 0.3) 0%, transparent 100%);
+            display: none;
+        }
+
+        .periscope-view.show {
+            display: block;
+        }
+
+        /* Creatures and treasures */
+        .creature, .treasure {
+            position: absolute;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+            z-index: 50;
+        }
+
+        .creature:hover, .treasure:hover {
+            transform: scale(1.2);
+        }
+
+        /* Bubbles */
+        .bubble {
+            position: absolute;
+            font-size: 1rem;
+            animation: floatUp 4s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            from { transform: translateY(0); opacity: 0.8; }
+            to { transform: translateY(-100vh); opacity: 0; }
+        }
+
+        /* HUD */
+        .hud {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .hud-item {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ccff;
+            border-radius: 10px;
+            padding: 10px 15px;
+            color: #00ffff;
+        }
+
+        .air-bar {
+            width: 150px;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .air-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4444, #ffff00, #44ff44);
+            transition: width 0.3s;
+        }
+
+        /* Dialog box */
+        .dialog {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid #00ffff;
+            border-radius: 20px;
+            padding: 20px;
+            max-width: 500px;
+            text-align: center;
+            z-index: 300;
+            display: none;
+        }
+
+        .dialog.show {
+            display: block;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from { transform: translateX(-50%) scale(0); }
+            to { transform: translateX(-50%) scale(1); }
+        }
+
+        .dialog-speaker {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .dialog-text {
+            color: #00ffff;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .dialog-close {
+            background: #00ccff;
+            color: #003366;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Comic Sans MS', cursive;
+            font-size: 1rem;
+        }
+
+        /* Badge */
+        .badge {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1a1a;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            z-index: 400;
+            display: none;
+            animation: badgeGlow 1s infinite;
+        }
+
+        .badge.show {
+            display: block;
+        }
+
+        @keyframes badgeGlow {
+            0%, 100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0 0 60px rgba(255, 215, 0, 0.8); }
+        }
+
+        /* Surface zone */
+        .surface-zone {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(180deg, rgba(135, 206, 250, 0.5) 0%, transparent 100%);
+            z-index: 10;
+        }
+
+        /* Controls hint */
+        .controls {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ccff;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 0.8rem;
+            color: #88ccff;
+            z-index: 200;
+        }
+
+        /* Discoveries panel */
+        .discoveries {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ccff;
+            border-radius: 10px;
+            padding: 10px;
+            max-width: 150px;
+            z-index: 200;
+        }
+
+        .discoveries h4 {
+            color: #00ffff;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .discovery-list {
+            font-size: 1.5rem;
+            line-height: 1.2;
+        }
+
+        /* Sound effect */
+        .sound-effect {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: #00ffff;
+            text-shadow: 0 0 20px #00ffff;
+            z-index: 250;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .sound-effect.show {
+            opacity: 1;
+        }
+
+        /* Random event */
+        .event-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 100, 100, 0.9);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 20px;
+            font-size: 1.5rem;
+            z-index: 350;
+            display: none;
+            animation: eventPop 0.5s ease;
+        }
+
+        .event-alert.show {
+            display: block;
+        }
+
+        @keyframes eventPop {
+            from { transform: translate(-50%, -50%) scale(0); }
+            to { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Shrimp boss battle */
+        .boss-battle {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 0, 0.3);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            flex-direction: column;
+        }
+
+        .boss-battle.show {
+            display: flex;
+        }
+
+        .boss {
+            font-size: 8rem;
+            animation: bossBounce 0.5s infinite;
+        }
+
+        @keyframes bossBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .boss-dialog {
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid #ff6666;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .boss-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .boss-btn {
+            background: #ff6666;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-family: 'Comic Sans MS', cursive;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        .boss-btn:hover {
+            background: #ff8888;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="ocean" id="ocean">
+            <div class="waves"></div>
+            <div class="surface-zone" id="surfaceZone"></div>
+        </div>
+
+        <div class="hud">
+            <div class="hud-item">
+                🏆 Treasures: <span id="treasureCount">0</span>
+            </div>
+            <div class="hud-item">
+                💨 Air: <div class="air-bar"><div class="air-fill" id="airBar" style="width: 100%"></div></div>
+            </div>
+        </div>
+
+        <div class="discoveries">
+            <h4>🐠 Discoveries</h4>
+            <div class="discovery-list" id="discoveryList"></div>
+        </div>
+
+        <div class="controls">
+            ⬆️⬇️⬅️➡️ or WASD to move<br>
+            Collect treasures!
+        </div>
+
+        <div class="sound-effect" id="soundEffect"></div>
+
+        <div class="dialog" id="dialog">
+            <div class="dialog-speaker" id="dialogSpeaker">🐠</div>
+            <div class="dialog-text" id="dialogText"></div>
+            <button class="dialog-close" onclick="closeDialog()">Continue</button>
+        </div>
+
+        <div class="event-alert" id="eventAlert"></div>
+
+        <div class="badge" id="badge">
+            🌊 DEEP SEA EXPLORER BADGE! 🌊<br>
+            You found 20 treasures!<br>
+            You are a legendary ocean explorer!
+        </div>
+
+        <div class="boss-battle" id="bossBattle">
+            <div class="boss">🦐</div>
+            <div class="boss-dialog">
+                <h2 style="color: #ff6666;">DR. SHRIMPKY!</h2>
+                <p style="color: #ffaaaa;">"I am Dr. Shrimpy! I will make ALL fish wear glasses!"</p>
+                <div class="boss-options">
+                    <button class="boss-btn" onclick="answerBoss('glasses')">"But fish don't have ears!"</button>
+                    <button class="boss-btn" onclick="answerBoss('underwater')">"Glasses fog up underwater!"</button>
+                    <button class="boss-btn" onclick="answerBoss('fashion')">"Glasses are so last season!"</button>
+                    <button class="boss-btn" onclick="answerBoss('shrimp')">"You're a shrimp, you don't wear glasses!"</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const creatures = [
+            { emoji: '🐠', name: 'Mustache Fish', x: 15, y: 30, message: 'I MUSTACHE you a question! What do you call a fish wearing a bowtie? Sofishticated! *nyuck nyuck nyuck*', discovered: false },
+            { emoji: '🐙', name: 'Chef Octopus', x: 45, y: 45, message: 'Welcome to my ocean kitchen! You look... delicious! I mean, nice to meet you! *wink*', discovered: false },
+            { emoji: '🦀', name: 'Hurry Crab', x: 75, y: 60, message: "I'm LATE! I'm LATE! For a very important DATE! Oh wait, that's tomorrow... *phew*", discovered: false },
+            { emoji: '🐢', name: 'Slow Turtle', x: 25, y: 55, message: 'Hellooooo... thereeeee... youngggg... travelerrrr... Want... to... hearrr... a... storyyyyy... it\'s... abouttt... moss...', discovered: false },
+            { emoji: '🦈', name: 'Vegan Shark', x: 85, y: 40, message: "Do you have any seaweed? I'm strictly vegan! Fish are friends, not food! *munches on kale*", discovered: false },
+            { emoji: '🐡', name: 'Puffer Pete', x: 60, y: 35, message: '*GASP!* Oh... it\'s just you... *deflates* You scared me! I almost puffed!', discovered: false },
+            { emoji: '🪼', name: 'Jelly Jelly', x: 35, y: 70, message: 'What do you call a fish who wears a bowtie? Sofishticated! *ba dum tss* I\'m here all week folks!', discovered: false },
+            { emoji: '🦑', name: 'Shy Sheldon', x: 90, y: 65, message: '*hides in ink* ... Is it gone? ... Hello? ... *peeks* Oh hello! *hides again*', discovered: false },
+            { emoji: '🐡', name: 'Clown Clownfish', x: 10, y: 45, message: 'I\'m a clown! No really, look at my stripes! *honk honk* Why did the clown fish cross the road? To get to the other tide!', discovered: false },
+            { emoji: '🦭', name: 'Detective Seal', x: 55, y: 80, message: 'I\'m investigating a bubble theft... have you seen any suspicious bubbles? They\'re very round and filled with air!', discovered: false }
+        ];
+
+        const treasures = [
+            { emoji: '🏆', name: "Pirate's Lost Lunch", x: 20, y: 50, desc: "It's a sandwich! Still good after 100 years!" },
+            { emoji: '🎁', name: 'Mermaid\'s Comb', x: 70, y: 55, desc: 'Has dandruff... eww. Maybe that\'s just sand?' },
+            { emoji: '💎', name: 'Atlantis Diamond', x: 40, y: 65, desc: 'Actually just polished glass. Still shiny!' },
+            { emoji: '🗝️', name: 'Secret Key', x: 80, y: 30, desc: 'Opens... something? No one knows what!' },
+            { emoji: '🪙', name: 'Gold Coin', x: 30, y: 75, desc: 'Chocolate coin! The chocolate is... gone.' },
+            { emoji: '👑', name: 'King Crab\'s Crown', x: 50, y: 25, desc: 'He was king for a day. Then he lost it.' },
+            { emoji: '📺', name: 'Atlantis TV Remote', x: 65, y: 45, desc: 'Batteries not included. Also, no TVs underwater.' },
+            { emoji: '🎸', name: 'Seahorse\'s Guitar', x: 15, y: 60, desc: 'He only knows one song: \'Bubble Bubble Bubble\'' },
+            { emoji: '⚓', name: 'Tiny Anchor', x: 85, y: 70, desc: 'For a very small boat. A paper boat maybe?' },
+            { emoji: '🧜‍♀️', name: 'Mermaid Statue', x: 45, y: 85, desc: 'It\'s just a mannequin. A very realistic mannequin...' },
+            { emoji: '🔦', name: 'Lantern Fish Light', x: 25, y: 40, desc: 'It still works! But only when it\'s dark. Which is always.' },
+            { emoji: '📿', name: 'Fish Necklace', x: 75, y: 80, desc: 'Made of real fish bones! Spooky!' },
+            { emoji: '🏖️', name: 'Beach Towel', x: 55, y: 55, desc: 'Dry as a bone! How did it get down here?!' },
+            { emoji: '🍕', name: 'Pizza Slice', x: 35, y: 30, desc: 'Still warm! Okay, slightly less warm.' },
+            { emoji: '🪸', name: 'Talking Coral', x: 90, y: 50, desc: 'It says "Ouch" when you touch it. Rude coral.' },
+            { emoji: '🧊', name: 'Ice Cube', x: 10, y: 70, desc: 'From the ice age! It hasn\'t melted yet!' },
+            { emoji: '🎭', name: 'Drama Mask', x: 60, y: 20, desc: 'For underwater theater. They perform "The Little Mermade"' },
+            { emoji: '🚪', name: 'Mysterious Door', x: 80, y: 85, desc: 'Opens to... more water. Very disappointing.' },
+            { emoji: '🧸', name: 'Teddy Bear', x: 20, y: 85, desc: 'A kid dropped this. The kid is now 40. Sorry kid.' },
+            { emoji: '⚽', name: 'Soccer Ball', x: 50, y: 75, desc: 'The fish don\'t understand soccer. They try to eat it.' },
+            { emoji: '🫧', name: 'THE GOLDEN BUBBLE!', x: 95, y: 50, desc: 'LEGENDARY TREASURE! It\'s... a bubble. But GOLDEN!' }
+        ];
+
+        const randomEvents = [
+            { emoji: '🐋', message: 'A whale says hi! *WAVE*' },
+            { emoji: '🌊', message: 'A big wave almost tips your sub! *WOOSH*' },
+            { emoji: '⚡', message: 'Electric eel party nearby! *ZZZAP!*' },
+            { emoji: '🐚', message: 'You found a talking shell! It says "HELLO!" then stops.' },
+            { emoji: '🦐', message: 'A shrimp waves at you! Or was that Dr. Shrimpy?!' }
+        ];
+
+        let submarine = { x: 50, y: 50 };
+        let air = 100;
+        let treasuresCollected = parseInt(localStorage.getItem('subTreasures')) || 0;
+        let discoveredCreatures = JSON.parse(localStorage.getItem('subDiscoveries')) || [];
+        let collectedTreasureIndices = JSON.parse(localStorage.getItem('subCollectedIndices')) || [];
+        let moving = { up: false, down: false, left: false, right: false };
+
+        const ocean = document.getElementById('ocean');
+        const sub = document.createElement('div');
+        sub.className = 'submarine';
+        sub.innerHTML = '🚢<div class="periscope-view" id="periscope"></div>';
+        ocean.appendChild(sub);
+
+        // Spawn creatures
+        creatures.forEach((c, i) => {
+            const el = document.createElement('div');
+            el.className = 'creature';
+            el.textContent = c.emoji;
+            el.style.left = c.x + '%';
+            el.style.top = c.y + '%';
+            el.onclick = () => meetCreature(i);
+            el.id = 'creature-' + i;
+            ocean.appendChild(el);
+        });
+
+        // Spawn treasures (only uncollected)
+        treasures.forEach((t, i) => {
+            if (!collectedTreasureIndices.includes(i)) {
+                const el = document.createElement('div');
+                el.className = 'treasure';
+                el.textContent = t.emoji;
+                el.style.left = t.x + '%';
+                el.style.top = t.y + '%';
+                el.onclick = () => collectTreasure(i);
+                el.id = 'treasure-' + i;
+                ocean.appendChild(el);
+            }
+        });
+
+        // Spawn golden bubble if not collected
+        const goldenBubbleIndex = treasures.length - 1;
+        if (treasuresCollected < 20) {
+            const bubble = document.createElement('div');
+            bubble.className = 'treasure';
+            bubble.style.fontSize = '3rem';
+            bubble.textContent = '🫧';
+            bubble.style.left = treasures[goldenBubbleIndex].x + '%';
+            bubble.style.top = treasures[goldenBubbleIndex].y + '%';
+            bubble.style.filter = 'drop-shadow(0 0 10px gold)';
+            bubble.onclick = () => collectTreasure(goldenBubbleIndex);
+            ocean.appendChild(bubble);
+        }
+
+        // Create floating bubbles
+        function createBubble() {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.textContent = '🫧';
+            bubble.style.left = Math.random() * 100 + '%';
+            bubble.style.bottom = '0';
+            ocean.appendChild(bubble);
+            setTimeout(() => bubble.remove(), 4000);
+        }
+        setInterval(createBubble, 2000);
+
+        // Update display
+        updateDisplay();
+
+        function updateDisplay() {
+            document.getElementById('treasureCount').textContent = treasuresCollected;
+            document.getElementById('airBar').style.width = air + '%';
+            updateDiscoveries();
+        }
+
+        function updateDiscoveries() {
+            const list = document.getElementById('discoveryList');
+            const unique = [...new Set(discoveredCreatures)];
+            list.textContent = unique.slice(0, 10).join(' ');
+        }
+
+        // Movement
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') moving.up = true;
+            if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') moving.down = true;
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') moving.left = true;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') moving.right = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') moving.up = false;
+            if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') moving.down = false;
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') moving.left = false;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') moving.right = false;
+        });
+
+        function gameLoop() {
+            const speed = 1;
+            let moved = false;
+
+            if (moving.up) { submarine.y = Math.max(5, submarine.y - speed); moved = true; }
+            if (moving.down) { submarine.y = Math.min(90, submarine.y + speed); moved = true; }
+            if (moving.left) { submarine.x = Math.max(0, submarine.x - speed); moved = true; }
+            if (moving.right) { submarine.x = Math.min(95, submarine.x + speed); moved = true; }
+
+            sub.style.left = submarine.x + '%';
+            sub.style.top = submarine.y + '%';
+
+            // Update submarine rotation
+            sub.classList.remove('going-up', 'going-down', 'going-left');
+            if (moving.up) sub.classList.add('going-up');
+            if (moving.down) sub.classList.add('going-down');
+            if (moving.left) sub.classList.add('going-left');
+
+            // Air decrease
+            if (submarine.y < 10) {
+                air = Math.min(100, air + 1); // Refill at surface
+            } else {
+                air = Math.max(0, air - 0.02);
+            }
+
+            if (air <= 0) {
+                // Respawn at surface
+                submarine.y = 5;
+                submarine.x = 50;
+                air = 100;
+                showDialog('⚠️', 'Out of air! *GASP* Resurfacing!', false);
+            }
+
+            updateDisplay();
+            requestAnimationFrame(gameLoop);
+        }
+        gameLoop();
+
+        function meetCreature(index) {
+            const creature = creatures[index];
+
+            if (!discoveredCreatures.includes(creature.name)) {
+                discoveredCreatures.push(creature.name);
+                localStorage.setItem('subDiscoveries', JSON.stringify(discoveredCreatures));
+                updateDisplay();
+            }
+
+            playSound('*GLUB GLUB*');
+            showDialog(creature.emoji, creature.message);
+        }
+
+        function collectTreasure(index) {
+            if (collectedTreasureIndices.includes(index)) return;
+
+            const treasure = treasures[index];
+
+            collectedTreasureIndices.push(index);
+            treasuresCollected++;
+            localStorage.setItem('subCollectedIndices', JSON.stringify(collectedTreasureIndices));
+            localStorage.setItem('subTreasures', treasuresCollected);
+
+            // Remove treasure from display
+            const el = document.getElementById('treasure-' + index);
+            if (el) el.remove();
+
+            playSound('*BLOOP BLEEP!*');
+            showDialog(treasure.emoji, `You found: ${treasure.name}\n\n${treasure.desc}`);
+
+            updateDisplay();
+
+            // Check for badge
+            if (treasuresCollected >= 20) {
+                document.getElementById('badge').classList.add('show');
+            }
+
+            // Golden bubble = boss battle
+            if (index === treasures.length - 1) {
+                setTimeout(() => {
+                    document.getElementById('bossBattle').classList.add('show');
+                }, 1000);
+            }
+
+            // Random event chance
+            if (Math.random() < 0.3) {
+                setTimeout(() => {
+                    const event = randomEvents[Math.floor(Math.random() * randomEvents.length)];
+                    showEvent(event.emoji + ' ' + event.message);
+                }, 2000);
+            }
+        }
+
+        function showDialog(speaker, text, canClose = true) {
+            document.getElementById('dialogSpeaker').textContent = speaker;
+            document.getElementById('dialogText').textContent = text;
+            document.getElementById('dialog').classList.add('show');
+        }
+
+        function closeDialog() {
+            document.getElementById('dialog').classList.remove('show');
+        }
+
+        function playSound(sound) {
+            const el = document.getElementById('soundEffect');
+            el.textContent = sound;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 1000);
+        }
+
+        function showEvent(text) {
+            const el = document.getElementById('eventAlert');
+            el.textContent = text;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        function answerBoss(answer) {
+            document.getElementById('bossBattle').classList.remove('show');
+            playSound('*VICTORY!*');
+            showDialog('🦐', 'NOOO! You\'re too clever! *runs away sideways*\n\nDR. SHRIMPKY has been defeated! The fish are free from glasses forever!');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌱 Garden of Weird Plants 🌱</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #87CEEB 0%, #98FB98 50%, #8B4513 100%);
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #228B22;
+            text-shadow: 3px 3px 0 #ffcc00, -1px -1px 0 #fff;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #556B2F;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            display: none;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1a1a;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: badgeGlow 1s infinite;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
+        .badge.show {
+            display: block;
+        }
+
+        @keyframes badgeGlow {
+            0%, 100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0 0 50px rgba(255, 215, 0, 0.8); }
+        }
+
+        .event-box {
+            background: linear-gradient(135deg, #ff69b4, #ff44ff);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+            display: none;
+            animation: popIn 0.5s ease;
+        }
+
+        .event-box.show {
+            display: block;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        .garden-bed {
+            background: linear-gradient(180deg, #8B4513 0%, #654321 100%);
+            border: 8px solid #5D3A1A;
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .garden-bed::before {
+            content: '🌱 THE WEIRD GARDEN 🌱';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #228B22;
+            color: white;
+            padding: 5px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .plants-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .plants-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .plant-spot {
+            background: #3d2817;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            min-height: 150px;
+            position: relative;
+        }
+
+        .plant {
+            font-size: 4rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: sway 2s ease-in-out infinite;
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        .plant.harvestable {
+            animation: bounce 0.5s ease infinite;
+            cursor: pointer;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .plant-face {
+            font-size: 1.5rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .plant-dialog {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 8px;
+            font-size: 0.8rem;
+            color: #333;
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            display: none;
+            z-index: 10;
+        }
+
+        .plant-spot:hover .plant-dialog {
+            display: block;
+        }
+
+        .growth-bar {
+            height: 8px;
+            background: #1a1a1a;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .growth-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #44ff44, #22cc22);
+            transition: width 0.5s ease;
+        }
+
+        .plant-name {
+            color: #ffcc00;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .harvest-btn {
+            background: linear-gradient(180deg, #ff8800, #cc6600);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .harvest-btn.show {
+            display: inline-block;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-btns {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .care-btn {
+            padding: 15px;
+            font-size: 1.5rem;
+            background: linear-gradient(180deg, #87CEEB, #4169E1);
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .care-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .seed-shop {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .seed-shop { grid-template-columns: repeat(2, 1fr); }
+            .control-btns { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .seed-btn {
+            background: linear-gradient(180deg, #90EE90, #228B22);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .seed-btn:hover {
+            background: linear-gradient(180deg, #98FB98, #32CD32);
+            transform: scale(1.05);
+        }
+
+        .collection {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .collection h3 {
+            text-align: center;
+            color: #228B22;
+            margin-bottom: 15px;
+        }
+
+        .collection-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .collection-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .fruit-item {
+            background: #f0fff0;
+            border: 2px solid #228B22;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .fruit-emoji {
+            font-size: 2rem;
+        }
+
+        .fruit-name {
+            font-size: 0.8rem;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .fruit-count {
+            font-size: 1.2rem;
+            color: #228B22;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            color: #ff6600;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #556B2F;
+        }
+
+        .personality-meter {
+            font-size: 0.7rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌱 GARDEN OF WEIRD PLANTS 🌱</h1>
+        <p class="subtitle">Grow the silliest plants in the universe!</p>
+
+        <div class="badge" id="masterGardenerBadge">
+            🌻 MASTER GARDENER BADGE! 🌻<br>
+            You've harvested 50 weird plants! You're a gardening legend!
+        </div>
+
+        <div class="event-box" id="eventBox"></div>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-value" id="totalHarvests">0</div>
+                <div class="stat-label">Total Harvests</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="plantsGrowing">0</div>
+                <div class="stat-label">Plants Growing</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="gardenLevel">1</div>
+                <div class="stat-label">Garden Level</div>
+            </div>
+        </div>
+
+        <div class="garden-bed">
+            <div class="plants-grid" id="gardenGrid">
+                <!-- Plants will appear here -->
+            </div>
+        </div>
+
+        <div class="controls">
+            <h3 style="text-align: center; color: #228B22; margin-bottom: 10px;">🛠️ GARDEN TOOLS 🛠️</h3>
+            <div class="control-btns">
+                <button class="care-btn" onclick="careForAll('water')" title="Water all plants">💧</button>
+                <button class="care-btn" onclick="careForAll('sing')" title="Sing to plants">🎵</button>
+                <button class="care-btn" onclick="careForAll('talk')" title="Talk to plants">💬</button>
+                <button class="care-btn" onclick="careForAll('treat')" title="Give treats">🎁</button>
+            </div>
+
+            <h3 style="text-align: center; color: #228B22; margin: 15px 0 10px;">🌱 SEED SHOP 🌱</h3>
+            <div class="seed-shop">
+                <button class="seed-btn" onclick="plantSeed('tomato')">🌱 Ticklish Tomato</button>
+                <button class="seed-btn" onclick="plantSeed('jalapeno')">🌱 Joking Jalapeño</button>
+                <button class="seed-btn" onclick="plantSeed('daisy')">🌱 Dancing Daisy</button>
+                <button class="seed-btn" onclick="plantSeed('sprout')">🌱 Sleepy Sprout</button>
+                <button class="seed-btn" onclick="plantSeed('grape')">🌱 Grumpy Grape</button>
+                <button class="seed-btn" onclick="plantSeed('herb')">🌱 Hyper Herb</button>
+            </div>
+        </div>
+
+        <div class="collection">
+            <h3>🧺 YOUR WEIRD HARVEST 🧺</h3>
+            <div class="collection-grid" id="collectionGrid">
+                <div class="fruit-item">
+                    <div class="fruit-emoji">🧃</div>
+                    <div class="fruit-name">Giggle Juice</div>
+                    <div class="fruit-count" id="giggleJuice">0</div>
+                </div>
+                <div class="fruit-item">
+                    <div class="fruit-emoji">🌶️</div>
+                    <div class="fruit-name">Pun Peppers</div>
+                    <div class="fruit-count" id="punPeppers">0</div>
+                </div>
+                <div class="fruit-item">
+                    <div class="fruit-emoji">💐</div>
+                    <div class="fruit-name">Boogy Bouquets</div>
+                    <div class="fruit-count" id="boogyBouquets">0</div>
+                </div>
+                <div class="fruit-item">
+                    <div class="fruit-emoji">😴</div>
+                    <div class="fruit-name">Nap Nuggets</div>
+                    <div class="fruit-count" id="napNuggets">0</div>
+                </div>
+                <div class="fruit-item">
+                    <div class="fruit-emoji">🍇</div>
+                    <div class="fruit-name">Compliment Jam</div>
+                    <div class="fruit-count" id="complimentJam">0</div>
+                </div>
+                <div class="fruit-item">
+                    <div class="fruit-emoji">⚡</div>
+                    <div class="fruit-name">Zoom Zest</div>
+                    <div class="fruit-count" id="zoomZest">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const plantTypes = {
+            tomato: {
+                name: 'Ticklish Tomato',
+                emoji: '🍅',
+                stages: ['🌱', '🌿', '🍃', '🌺', '🍅'],
+                fruit: 'giggleJuice',
+                reactions: [
+                    '*hee hee* that tickles!',
+                    'HAHA stop it!',
+                    '*giggle* more water please!',
+                    'I\'m so ticklish! *hee hee*',
+                    'That\'s the spot! *teehee*'
+                ],
+                personality: 'giggly'
+            },
+            jalapeno: {
+                name: 'Joking Jalapeño',
+                emoji: '🌶️',
+                stages: ['🌱', '🌿', '🌺', '🌶️', '🌶️'],
+                fruit: 'punPeppers',
+                reactions: [
+                    'Why did the tomato blush? Because it saw salad dressing!',
+                    'What do you call a fake noodle? An impasta!',
+                    'Why don\'t eggs tell jokes? They\'d crack each other up!',
+                    'I\'m on a roll... a taco roll!',
+                    'Lettuce turnip the beat!'
+                ],
+                personality: 'funny'
+            },
+            daisy: {
+                name: 'Dancing Daisy',
+                emoji: '🌼',
+                stages: ['🌱', '🌿', '🌷', '🌸', '💃'],
+                fruit: 'boogyBouquets',
+                reactions: [
+                    '*dance dance dance*',
+                    '🎶 I feel the rhythm! 🎶',
+                    '*twirl* 🌟',
+                    'I\'m dancing like nobody\'s watching!',
+                    '*groove groove groove*'
+                ],
+                personality: 'dancy'
+            },
+            sprout: {
+                name: 'Sleepy Sprout',
+                emoji: '🥬',
+                stages: ['🌱', '🌿', '🥦', '🥬', '😴'],
+                fruit: 'napNuggets',
+                reactions: [
+                    '*zzz*... five more minutes...',
+                    'So sleepy... *yawn*',
+                    '*snore*... was that a bug?',
+                    'Water? Okay... *yawn*... now I sleep...',
+                    'Dreaming of... *zzz*... fertilizer...'
+                ],
+                personality: 'sleepy'
+            },
+            grape: {
+                name: 'Grumpy Grape',
+                emoji: '🍇',
+                stages: ['🌱', '🌿', '🍇', '🍇', '😠'],
+                fruit: 'complimentJam',
+                reactions: [
+                    'Ugh, sunlight again? My day is ruined.',
+                    'Great, more water. Whatever.',
+                    'I hate bugs. And bees. And everything.',
+                    'Don\'t touch me. I\'m in a bad mood.',
+                    'Why do we even grow? It\'s pointless.'
+                ],
+                personality: 'grumpy'
+            },
+            herb: {
+                name: 'Hyper Herb',
+                emoji: '🌿',
+                stages: ['🌱', '🍃', '🌿', '🌱', '🏃'],
+                fruit: 'zoomZest',
+                reactions: [
+                    'I\'M SO EXCITED ABOUT WATER!!!',
+                    'GROWING IS THE BEST THING EVER!!!',
+                    'LOOK AT ME I\'M SO GREEN!!!',
+                    'I CAN\'T STOP PHOTOSYNTHESIZING!!!',
+                    'EVERYTHING IS AMAZING!!!'
+                ],
+                personality: 'hyper'
+            }
+        };
+
+        const gardenEvents = [
+            '🐌 A snail is racing across your garden! It\'s going SO FAST! (Not really)',
+            '🎉 Your plants are throwing a party! Everyone\'s invited! (Well, just the plants)',
+            '🌱 A mysterious wind brought... MYSTERIOUS ENERGY! All plants grow faster!',
+            '🦋 A butterfly is judging your gardening skills. It seems... unimpressed?',
+            '☀️ The sun is smiling on your garden today! (+ growth boost!)',
+            '🐛 A caterpillar says "Hi!" and then eats a leaf. Rude, but polite!',
+            '🌈 A rainbow appeared over your garden! The plants feel magical!',
+            '🎃 A pumpkin rolled by. No one knows where it came from.'
+        ];
+
+        let garden = JSON.parse(localStorage.getItem('weirdGarden')) || { plants: [], harvests: {} };
+        let totalHarvests = parseInt(localStorage.getItem('totalHarvests')) || 0;
+        let selectedPlant = null;
+
+        // Initialize harvest counts
+        const fruits = ['giggleJuice', 'punPeppers', 'boogyBouquets', 'napNuggets', 'complimentJam', 'zoomZest'];
+        fruits.forEach(f => {
+            if (!garden.harvests[f]) garden.harvests[f] = 0;
+        });
+
+        function updateDisplay() {
+            // Update stats
+            document.getElementById('totalHarvests').textContent = totalHarvests;
+            document.getElementById('plantsGrowing').textContent = garden.plants.length;
+            document.getElementById('gardenLevel').textContent = Math.floor(totalHarvests / 10) + 1;
+
+            // Update fruit counts
+            document.getElementById('giggleJuice').textContent = garden.harvests.giggleJuice;
+            document.getElementById('punPeppers').textContent = garden.harvests.punPeppers;
+            document.getElementById('boogyBouquets').textContent = garden.harvests.boogyBouquets;
+            document.getElementById('napNuggets').textContent = garden.harvests.napNuggets;
+            document.getElementById('complimentJam').textContent = garden.harvests.complimentJam;
+            document.getElementById('zoomZest').textContent = garden.harvests.zoomZest;
+
+            // Check badge
+            if (totalHarvests >= 50) {
+                document.getElementById('masterGardenerBadge').classList.add('show');
+            }
+
+            renderGarden();
+        }
+
+        function renderGarden() {
+            const grid = document.getElementById('gardenGrid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < 6; i++) {
+                const plant = garden.plants[i];
+                const spot = document.createElement('div');
+                spot.className = 'plant-spot';
+
+                if (plant) {
+                    const type = plantTypes[plant.type];
+                    const stageIndex = Math.min(plant.growth, 4);
+                    const isAdult = plant.growth >= 4;
+
+                    spot.innerHTML = `
+                        <div class="plant-dialog" id="dialog-${i}"></div>
+                        <div class="plant ${isAdult ? 'harvestable' : ''}" onclick="interactPlant(${i})">
+                            ${isAdult ? '🌟' : type.stages[stageIndex]}
+                        </div>
+                        <div class="growth-bar">
+                            <div class="growth-fill" style="width: ${(plant.growth / 4) * 100}%"></div>
+                        </div>
+                        <div class="plant-name">${type.name}</div>
+                        <div class="personality-meter">Personality: ${getPersonalityEmoji(plant.personality)}</div>
+                        ${isAdult ? `<button class="harvest-btn show" onclick="harvestPlant(${i})">🧺 Harvest!</button>` : ''}
+                    `;
+
+                    // Show reaction dialog
+                    if (plant.reaction) {
+                        const dialog = spot.querySelector(`#dialog-${i}`);
+                        dialog.textContent = plant.reaction;
+                        dialog.style.display = 'block';
+                        setTimeout(() => {
+                            dialog.style.display = 'none';
+                            plant.reaction = null;
+                        }, 2000);
+                    }
+                } else {
+                    spot.innerHTML = `
+                        <div style="font-size: 3rem; opacity: 0.3; padding-top: 30px;">🕳️</div>
+                        <div class="plant-name" style="color: #888;">Empty spot</div>
+                    `;
+                }
+
+                grid.appendChild(spot);
+            }
+        }
+
+        function getPersonalityEmoji(personality) {
+            const emojis = {
+                giggly: '😄',
+                funny: '😂',
+                dancy: '💃',
+                sleepy: '😴',
+                grumpy: '😠',
+                hyper: '🤪'
+            };
+            return emojis[personality] || '🌱';
+        }
+
+        function plantSeed(type) {
+            // Find empty spot
+            const emptyIndex = garden.plants.findIndex(p => !p);
+            if (emptyIndex === -1) {
+                showEvent('🚫 No empty spots! Harvest some plants first!');
+                return;
+            }
+
+            const newPlant = {
+                type: type,
+                growth: 0,
+                personality: Math.random() * 100,
+                reaction: plantTypes[type].reactions[0]
+            };
+
+            garden.plants[emptyIndex] = newPlant;
+            saveGarden();
+            updateDisplay();
+            showEvent(`🌱 Planted a ${plantTypes[type].name}!`);
+        }
+
+        function interactPlant(index) {
+            const plant = garden.plants[index];
+            if (!plant) return;
+
+            // Harvest if ready
+            if (plant.growth >= 4) {
+                harvestPlant(index);
+                return;
+            }
+
+            // Otherwise, just show reaction
+            const type = plantTypes[plant.type];
+            plant.reaction = type.reactions[Math.floor(Math.random() * type.reactions.length)];
+            updateDisplay();
+        }
+
+        function careForAll(action) {
+            const actionNames = {
+                water: '💧',
+                sing: '🎵',
+                talk: '💬',
+                treat: '🎁'
+            };
+
+            const growthBoosts = {
+                water: 1,
+                sing: 1.5,
+                talk: 1,
+                treat: 2
+            };
+
+            let boosted = 0;
+
+            garden.plants.forEach((plant, index) => {
+                if (plant && plant.growth < 4) {
+                    const type = plantTypes[plant.type];
+                    plant.growth = Math.min(4, plant.growth + growthBoosts[action]);
+                    plant.reaction = type.reactions[Math.floor(Math.random() * type.reactions.length)];
+                    boosted++;
+                }
+            });
+
+            if (boosted > 0) {
+                saveGarden();
+                updateDisplay();
+                showEvent(`${actionNames[action]} Cared for ${boosted} plants!`);
+
+                // Random event chance
+                if (Math.random() < 0.3) {
+                    setTimeout(() => {
+                        showEvent(gardenEvents[Math.floor(Math.random() * gardenEvents.length)]);
+                    }, 1000);
+                }
+            } else {
+                showEvent('🤷 No plants to care for! Plant some seeds!');
+            }
+        }
+
+        function harvestPlant(index) {
+            const plant = garden.plants[index];
+            if (!plant || plant.growth < 4) return;
+
+            const type = plantTypes[plant.type];
+            garden.harvests[type.fruit]++;
+
+            totalHarvests++;
+            localStorage.setItem('totalHarvests', totalHarvests);
+
+            // Remove plant
+            garden.plants[index] = null;
+            saveGarden();
+            updateDisplay();
+
+            showEvent(`🧺 Harvested ${type.name}! Got ${type.fruit === 'giggleJuice' ? 'Giggle Juice' : type.fruit === 'punPeppers' ? 'Pun Peppers' : type.fruit === 'boogyBouquets' ? 'Boogy Bouquets' : type.fruit === 'napNuggets' ? 'Nap Nuggets' : type.fruit === 'complimentJam' ? 'Compliment Jam' : 'Zoom Zest'}!`);
+        }
+
+        function showEvent(message) {
+            const eventBox = document.getElementById('eventBox');
+            eventBox.textContent = message;
+            eventBox.classList.add('show');
+
+            setTimeout(() => {
+                eventBox.classList.remove('show');
+            }, 3000);
+        }
+
+        function saveGarden() {
+            localStorage.setItem('weirdGarden', JSON.stringify(garden));
+        }
+
+        // Initialize
+        updateDisplay();
+
+        // Random events every 30 seconds
+        setInterval(() => {
+            if (garden.plants.length > 0 && Math.random() < 0.4) {
+                showEvent(gardenEvents[Math.floor(Math.random() * gardenEvents.length)]);
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

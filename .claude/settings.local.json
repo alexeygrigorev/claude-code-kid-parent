@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(python:*)",
+      "Bash(chmod:*)",
+      "Bash(bash:*)",
+      "Bash(timeout:*)",
+      "Skill(kid)",
+      "Skill(parent)",
+      "Bash(claude:*)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

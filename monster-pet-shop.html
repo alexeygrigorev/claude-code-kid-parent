@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👾 Monster Pet Shop 👾</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1a0a2e 0%, #2a1a4e 50%, #3a2a5e 100%);
+            color: #e0d0ff;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #ff69b4;
+            text-shadow: 3px 3px 0 #8844ff, 0 0 20px #ff69b4;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #aa88cc;
+            margin-bottom: 20px;
+        }
+
+        /* Egg Selection Screen */
+        .egg-screen {
+            display: block;
+        }
+
+        .egg-screen.hidden {
+            display: none;
+        }
+
+        .eggs-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .egg-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid;
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .egg-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px currentColor;
+        }
+
+        .egg {
+            font-size: 4rem;
+            animation: wobble 2s ease-in-out infinite;
+        }
+
+        @keyframes wobble {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        .egg-name {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .egg-desc {
+            font-size: 0.75rem;
+            margin-top: 5px;
+            color: #cc99ff;
+        }
+
+        /* Monster Screen */
+        .monster-screen {
+            display: none;
+        }
+
+        .monster-screen.show {
+            display: block;
+        }
+
+        .monster-name-display {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #ffcc00;
+            margin-bottom: 15px;
+        }
+
+        .monster-stage {
+            text-align: center;
+            color: #ff69b4;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .monster-display {
+            background: rgba(255, 255, 255, 0.05);
+            border: 3px solid #8844ff;
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .monster {
+            font-size: 6rem;
+            animation: bounce 1s ease-in-out infinite;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .monster.talking {
+            animation: bounce 0.3s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .monster-face {
+            position: absolute;
+            font-size: 2rem;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .monster-talk {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #00ff88;
+            min-height: 30px;
+            margin-top: 10px;
+        }
+
+        .zzz {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: floatZ 2s ease-in-out infinite;
+            opacity: 0;
+        }
+
+        .zzz.show {
+            opacity: 1;
+        }
+
+        @keyframes floatZ {
+            0% { transform: translateY(0) translateX(0); opacity: 1; }
+            100% { transform: translateY(-50px) translateX(20px); opacity: 0; }
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #cc99ff;
+        }
+
+        .stat-bar {
+            height: 15px;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .stat-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .hunger-fill { background: linear-gradient(90deg, #ff4444, #ff8800); }
+        .happiness-fill { background: linear-gradient(90deg, #44ff44, #88ff88); }
+        .energy-fill { background: linear-gradient(90deg, #4488ff, #88ccff); }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            padding: 15px;
+            font-size: 1rem;
+            font-family: 'Comic Sans MS', cursive;
+            cursor: pointer;
+            border: none;
+            border-radius: 15px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .feed-btn { background: linear-gradient(180deg, #ff6b6b, #cc4444); color: white; }
+        .play-btn { background: linear-gradient(180deg, #ffd93d, #ffaa00); color: #333; }
+        .sleep-btn { background: linear-gradient(180deg, #6bcfff, #44aadd); color: white; }
+
+        .action-btn:hover { transform: scale(1.05); }
+
+        .food-menu {
+            display: none;
+            background: rgba(255, 107, 107, 0.2);
+            border: 2px solid #ff6b6b;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .food-menu.show { display: block; }
+
+        .food-menu h4 {
+            text-align: center;
+            color: #ffaaaa;
+            margin-bottom: 10px;
+        }
+
+        .food-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .food-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #ff8888;
+            color: #ffcccc;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .food-btn:hover { background: rgba(255, 255, 255, 0.2); }
+
+        .event-box {
+            background: linear-gradient(135deg, #ff69b4, #9944dd);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .event-box.show { display: block; animation: popIn 0.5s ease; }
+
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        .hall-of-fame {
+            display: none;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #333;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+            animation: glow 1s infinite;
+        }
+
+        .hall-of-fame.show { display: block; }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px #ffd700; }
+            50% { box-shadow: 0 0 40px #ffd700; }
+        }
+
+        .last-visit {
+            text-align: center;
+            color: #8877aa;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+        }
+
+        .evolution-progress {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #00ff88;
+        }
+
+        @media (max-width: 500px) {
+            .eggs-grid { grid-template-columns: repeat(2, 1fr); }
+            .monster { font-size: 4rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👾 MONSTER PET SHOP 👾</h1>
+        <p class="subtitle">Adopt your very own monster friend!</p>
+
+        <!-- Egg Selection Screen -->
+        <div class="egg-screen" id="eggScreen">
+            <h3 style="text-align: center; color: #ff69b4; margin-bottom: 20px;">Choose your egg!</h3>
+            <div class="eggs-grid">
+                <div class="egg-card" style="border-color: #9944ff;" onclick="adoptEgg('purple')">
+                    <div class="egg">🥚</div>
+                    <div class="egg-name">Purple Polka Dot</div>
+                    <div class="egg-desc">"Will hatch into a JOKE-LOVING monster!"</div>
+                </div>
+                <div class="egg-card" style="border-color: #4488ff;" onclick="adoptEgg('blue')">
+                    <div class="egg">🥚</div>
+                    <div class="egg-name">Blue Striped</div>
+                    <div class="egg-desc">"Will hatch into a SWIMMING champion!"</div>
+                </div>
+                <div class="egg-card" style="border-color: #44ff88;" onclick="adoptEgg('green')">
+                    <div class="egg">🥚</div>
+                    <div class="egg-name">Green Sparkly</div>
+                    <div class="egg-desc">"Will hatch into a BURPING expert!"</div>
+                </div>
+                <div class="egg-card" style="border-color: #ff4466;" onclick="adoptEgg('red')">
+                    <div class="egg">🥚</div>
+                    <div class="egg-name">Red Bumpy</div>
+                    <div class="egg-desc">"Will hatch into a HUGGING master!"</div>
+                </div>
+                <div class="egg-card" style="border-color: #ffaa00;" onclick="adoptEgg('yellow')">
+                    <div class="egg">🥚</div>
+                    <div class="egg-name">Yellow Zigzag</div>
+                    <div class="egg-desc">"Will hatch into a DANCING sensation!"</div>
+                </div>
+                <div class="egg-card" style="border-color: #ff69b4;" onclick="adoptEgg('rainbow')">
+                    <div class="egg">🥚</div>
+                    <div class="egg-name">Rainbow Swirl</div>
+                    <div class="egg-desc">"Will hatch into a MYSTERY monster!!!"</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monster Screen -->
+        <div class="monster-screen" id="monsterScreen">
+            <div class="monster-name-display" id="monsterName">Sir Monster</div>
+            <div class="monster-stage" id="monsterStage">👶 BABY</div>
+            <div class="last-visit" id="lastVisit"></div>
+
+            <div class="monster-display">
+                <div class="monster" id="monster" onclick="pokeMonster()">
+                    <span class="monster-face">😊</span>
+                    <span class="zzz" id="zzz1" style="top: 10px; right: 20px;">💤</span>
+                    <span class="zzz" id="zzz2" style="top: 30px; right: 40px; animation-delay: 0.5s;">💤</span>
+                    <span class="zzz" id="zzz3" style="top: 50px; right: 60px; animation-delay: 1s;">💤</span>
+                </div>
+                <div class="monster-talk" id="monsterTalk"></div>
+                <div class="evolution-progress" id="evolutionProgress"></div>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-label">🍖 HUNGER</div>
+                    <div class="stat-bar"><div class="stat-fill hunger-fill" id="hungerBar" style="width: 100%;"></div></div>
+                    <div style="font-size: 0.8rem;" id="hungerValue">100</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">😊 HAPPINESS</div>
+                    <div class="stat-bar"><div class="stat-fill happiness-fill" id="happinessBar" style="width: 100%;"></div></div>
+                    <div style="font-size: 0.8rem;" id="happinessValue">100</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">⚡ ENERGY</div>
+                    <div class="stat-bar"><div class="stat-fill energy-fill" id="energyBar" style="width: 100%;"></div></div>
+                    <div style="font-size: 0.8rem;" id="energyValue">100</div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="action-btn feed-btn" onclick="toggleFoodMenu()">🍖 FEED</button>
+                <button class="action-btn play-btn" onclick="playMonster()">🎮 PLAY</button>
+                <button class="action-btn sleep-btn" onclick="sleepMonster()">😴 SLEEP</button>
+            </div>
+
+            <div class="food-menu" id="foodMenu">
+                <h4>Choose a food!</h4>
+                <div class="food-options">
+                    <button class="food-btn" onclick="feedMonster('pizza')">🍕 Pizza</button>
+                    <button class="food-btn" onclick="feedMonster('sock')">🧦 Sock</button>
+                    <button class="food-btn" onclick="feedMonster('rainbow')">🌈 Rainbow</button>
+                    <button class="food-btn" onclick="feedMonster('burrito')">🌯 Burrito</button>
+                    <button class="food-btn" onclick="feedMonster('cloud')">☁️ Cloud</button>
+                    <button class="food-btn" onclick="feedMonster('scale')">🐉 Dragon Scale</button>
+                </div>
+            </div>
+
+            <div class="event-box" id="eventBox"></div>
+
+            <div class="hall-of-fame" id="hallOfFame">
+                <h2>🏆 MONSTER HALL OF FAME 🏆</h2>
+                <div id="hallOfFameContent"></div>
+            </div>
+
+            <button style="width: 100%; padding: 10px; background: #664488; color: white; border: none; border-radius: 10px; cursor: pointer; margin-top: 15px;" onclick="newMonster()">🥚 Start New Monster</button>
+        </div>
+    </div>
+
+    <script>
+        // Monster data
+        const eggTypes = {
+            purple: {
+                color: '#9944ff',
+                monster: '👾',
+                babyNames: ['Sir Jokes-A-Lot', 'Lady Giggles', 'Prankster Pete', 'Laughy Larry'],
+                kidNames: ['Sir Chuckles', 'Lady Guffaw', 'Jokester Joe', 'Smiley Sam'],
+                adultNames: ['King of Comedy', 'Queen of Quips', 'Duke of Giggles', 'Baron of Belly-Laughs'],
+                trait: 'joke'
+            },
+            blue: {
+                color: '#4488ff',
+                monster: '🐙',
+                babyNames: ['Splashy', 'Bubbles', 'Finnegan', 'Swirly'],
+                kidNames: ['Captain Splash', 'Lady Ripple', 'Admiral Waves', 'Duke Dive'],
+                adultNames: ['Lord of the Ocean', 'Queen of the Seas', 'Master of Tides', 'Ruler of Rivers'],
+                trait: 'swim'
+            },
+            green: {
+                color: '#44ff88',
+                monster: '👹',
+                babyNames: ['Burpy', 'Gurgle', 'Toot', 'Rumble'],
+                kidNames: ['Sir Burps', 'Lady Bubbles', 'Baron Belch', 'Duke of Gas'],
+                adultNames: ['King of Burps', 'Queen of Rumbles', 'Master of Tummy Noises', 'Gastro Guardian'],
+                trait: 'burp'
+            },
+            red: {
+                color: '#ff4466',
+                monster: '🧸',
+                babyNames: ['Cuddles', 'Snuggles', 'Huggy', 'Lovey'],
+                kidNames: ['Captain Cuddle', 'Lady Snuggle', 'Hugsy', 'Dovey'],
+                adultNames: ['King of Hugs', 'Queen of Cuddles', 'Master of Warm Fuzzies', 'Guardian of Love'],
+                trait: 'hug'
+            },
+            yellow: {
+                color: '#ffaa00',
+                monster: '🐤',
+                babyNames: ['Twinkle', 'Boogie', 'Jiggle', 'Wiggle'],
+                kidNames: ['Disco Dan', 'Lady Twist', 'Boogie Bill', 'Jive Jill'],
+                adultNames: ['King of Dance', 'Queen of Boogie', 'Master of Groove', 'Ruler of Rhythm'],
+                trait: 'dance'
+            },
+            rainbow: {
+                color: '#ff69b4',
+                monster: '🦄',
+                babyNames: ['Sparkle', 'Glitter', 'Shimmer', 'Glimmer'],
+                kidNames: ['Captain Wonder', 'Lady Amazing', 'Spectacular Sam', 'Awesome Abe'],
+                adultNames: ['King of Mystery', 'Queen of Wonder', 'Master of the Unknown', 'Ruler of Imagination'],
+                trait: 'mystery'
+            }
+        };
+
+        const monsterSounds = ['Gurgle!', 'Bleep!', 'Honk!', 'Woooo!', 'Meep!', 'Boop!', 'Glub!', 'Zap!'];
+
+        const jokes = [
+            'Why did the monster cross the road? To get to the other SIDE-splitting!',
+            'What do you call a monster who loves pizza? A pepper-oni!',
+            'Why are monsters so happy? Because they live in laugh-ter!',
+            'What did one monster say to the other? You look grrr-eat!'
+        ];
+
+        const foodEffects = {
+            pizza: { hunger: 25, happiness: 10 },
+            sock: { hunger: 5, happiness: -5 },
+            rainbow: { hunger: 15, happiness: 20 },
+            burrito: { hunger: 30, happiness: 5 },
+            cloud: { hunger: 10, happiness: 15 },
+            scale: { hunger: 35, happiness: 10 }
+        };
+
+        // Game state
+        let monster = null;
+        let evolutionTimer = 0;
+        let statInterval = null;
+        let evolutionInterval = null;
+
+        // Load or create
+        function init() {
+            const saved = localStorage.getItem('monsterPet');
+            if (saved) {
+                monster = JSON.parse(saved);
+                showMonsterScreen();
+                updateLastVisit();
+                startStatDecay();
+            }
+        }
+
+        function saveMonster() {
+            if (monster) {
+                monster.lastSave = Date.now();
+                localStorage.setItem('monsterPet', JSON.stringify(monster));
+            }
+        }
+
+        function updateLastVisit() {
+            if (monster && monster.lastSave) {
+                const diff = Date.now() - monster.lastSave;
+                const minutes = Math.floor(diff / 60000);
+                document.getElementById('lastVisit').textContent = `Last visit: ${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+            }
+        }
+
+        function adoptEgg(type) {
+            const eggData = eggTypes[type];
+            const stage = type === 'rainbow' ? 'mystery' : eggData.trait;
+
+            monster = {
+                type: type,
+                name: eggData.babyNames[Math.floor(Math.random() * eggData.babyNames.length)],
+                stage: 0, // 0 = baby, 1 = kid, 2 = adult
+                stats: { hunger: 100, happiness: 100, energy: 100 },
+                color: eggData.color,
+                monster: eggData.monster,
+                eggData: eggData,
+                lastSave: Date.now(),
+                age: 0
+            };
+
+            saveMonster();
+            showMonsterScreen();
+            startStatDecay();
+            saySound("I'm born!");
+        }
+
+        function showMonsterScreen() {
+            document.getElementById('eggScreen').classList.add('hidden');
+            document.getElementById('monsterScreen').classList.add('show');
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            if (!monster) return;
+
+            const eggData = monster.eggData;
+            const stageNames = ['babyNames', 'kidNames', 'adultNames'];
+            const stageLabels = ['👶 BABY', '🧒 KID', '👨 ADULT'];
+            const sizes = ['4rem', '5rem', '7rem'];
+
+            // Update name based on stage
+            const names = eggData[stageNames[monster.stage]];
+            const nameIndex = Math.min(monster.age, names.length - 1);
+            monster.name = names[nameIndex];
+
+            document.getElementById('monsterName').textContent = monster.name;
+            document.getElementById('monsterStage').textContent = stageLabels[monster.stage];
+
+            // Update monster appearance
+            const monsterEl = document.getElementById('monster');
+            monsterEl.textContent = monster.monster;
+            monsterEl.style.fontSize = sizes[monster.stage];
+            monsterEl.style.color = monster.color;
+
+            // Update stats
+            document.getElementById('hungerBar').style.width = monster.stats.hunger + '%';
+            document.getElementById('hungerValue').textContent = monster.stats.hunger;
+            document.getElementById('happinessBar').style.width = monster.stats.happiness + '%';
+            document.getElementById('happinessValue').textContent = monster.stats.happiness;
+            document.getElementById('energyBar').style.width = monster.stats.energy + '%';
+            document.getElementById('energyValue').textContent = monster.stats.energy;
+
+            // Evolution progress
+            if (monster.stage < 2) {
+                const avg = (monster.stats.hunger + monster.stats.happiness + monster.stats.energy) / 3;
+                if (avg >= 80) {
+                    document.getElementById('evolutionProgress').textContent = '⭐ All stats high! Evolution in ' + (60 - evolutionTimer) + ' seconds!';
+                    evolutionTimer++;
+                    if (evolutionTimer >= 60) {
+                        evolve();
+                    }
+                } else {
+                    document.getElementById('evolutionProgress').textContent = 'Keep all stats above 80 to evolve!';
+                    evolutionTimer = 0;
+                }
+            } else {
+                document.getElementById('hallOfFame').classList.add('show');
+                document.getElementById('hallOfFameContent').innerHTML = `
+                    <p style="font-size: 1.2rem;">🎉 ${monster.name} 🎉</p>
+                    <p>Has reached MAXIMUM MONSTER STATUS!</p>
+                    <p style="font-size: 2rem;">🏆👾🏆</p>
+                `;
+            }
+        }
+
+        function startStatDecay() {
+            if (statInterval) clearInterval(statInterval);
+            if (evolutionInterval) clearInterval(evolutionInterval);
+
+            statInterval = setInterval(() => {
+                if (!monster) return;
+
+                // Decay stats
+                monster.stats.hunger = Math.max(0, monster.stats.hunger - 2);
+                monster.stats.happiness = Math.max(0, monster.stats.happiness - 1);
+                monster.stats.energy = Math.max(0, monster.stats.energy - 1);
+
+                // Random events
+                if (Math.random() < 0.1) {
+                    randomEvent();
+                }
+
+                updateDisplay();
+                saveMonster();
+            }, 5000);
+        }
+
+        function toggleFoodMenu() {
+            document.getElementById('foodMenu').classList.toggle('show');
+        }
+
+        function feedMonster(food) {
+            if (!monster) return;
+
+            const effect = foodEffects[food];
+            monster.stats.hunger = Math.min(100, monster.stats.hunger + effect.hunger);
+            monster.stats.happiness = Math.min(100, monster.stats.happiness + effect.happiness);
+
+            saySound('*crunch munch!*');
+            document.getElementById('foodMenu').classList.remove('show');
+            updateDisplay();
+            saveMonster();
+        }
+
+        function playMonster() {
+            if (!monster || monster.stats.energy < 10) {
+                saySound('*yawn* too tired...');
+                return;
+            }
+
+            monster.stats.happiness = Math.min(100, monster.stats.happiness + 20);
+            monster.stats.energy = Math.max(0, monster.stats.energy - 10);
+
+            const monsterEl = document.getElementById('monster');
+            monsterEl.classList.add('talking');
+            setTimeout(() => monsterEl.classList.remove('talking'), 1000);
+
+            saySound('Wheee! ' + monsterSounds[Math.floor(Math.random() * monsterSounds.length)]);
+            updateDisplay();
+            saveMonster();
+        }
+
+        function sleepMonster() {
+            if (!monster) return;
+
+            monster.stats.energy = Math.min(100, monster.stats.energy + 30);
+
+            // Show Zzz
+            document.getElementById('zzz1').classList.add('show');
+            document.getElementById('zzz2').classList.add('show');
+            document.getElementById('zzz3').classList.add('show');
+
+            saySound('*zzz...*');
+
+            setTimeout(() => {
+                document.getElementById('zzz1').classList.remove('show');
+                document.getElementById('zzz2').classList.remove('show');
+                document.getElementById('zzz3').classList.remove('show');
+            }, 3000);
+
+            updateDisplay();
+            saveMonster();
+        }
+
+        function pokeMonster() {
+            if (!monster) return;
+            saySound(monsterSounds[Math.floor(Math.random() * monsterSounds.length)]);
+        }
+
+        function saySound(text) {
+            document.getElementById('monsterTalk').textContent = text;
+            setTimeout(() => {
+                document.getElementById('monsterTalk').textContent = '';
+            }, 2000);
+        }
+
+        function randomEvent() {
+            const events = [
+                { text: '🎉 Your monster found a TREASURE! Happiness +20!', effect: () => { monster.stats.happiness = Math.min(100, monster.stats.happiness + 20); } },
+                { text: '😂 Your monster told a JOKE! "' + jokes[Math.floor(Math.random() * jokes.length)] + '"', effect: () => {} },
+                { text: '😴 Your monster took a nap! Energy +15!', effect: () => { monster.stats.energy = Math.min(100, monster.stats.energy + 15); } },
+                { text: '😋 Your monster found a snack! Hunger +10!', effect: () => { monster.stats.hunger = Math.min(100, monster.stats.hunger + 10); } },
+                { text: '😢 Your monster is feeling lonely... Happiness -10', effect: () => { monster.stats.happiness = Math.max(0, monster.stats.happiness - 10); } }
+            ];
+
+            const event = events[Math.floor(Math.random() * events.length)];
+            event.effect();
+
+            const eventBox = document.getElementById('eventBox');
+            eventBox.textContent = event.text;
+            eventBox.classList.add('show');
+
+            setTimeout(() => eventBox.classList.remove('show'), 4000);
+        }
+
+        function evolve() {
+            if (monster.stage < 2) {
+                monster.stage++;
+                monster.age = 0;
+                evolutionTimer = 0;
+
+                saySound('✨ EVOLUTION! ✨');
+
+                const monsterEl = document.getElementById('monster');
+                monsterEl.style.animation = 'none';
+                monsterEl.offsetHeight; // Trigger reflow
+                monsterEl.style.animation = 'bounce 0.3s ease-in-out infinite';
+
+                setTimeout(() => {
+                    monsterEl.style.animation = 'bounce 1s ease-in-out infinite';
+                }, 2000);
+
+                updateDisplay();
+                saveMonster();
+            }
+        }
+
+        function newMonster() {
+            if (confirm('Are you sure you want to start a new monster? Your current monster will be lost!')) {
+                localStorage.removeItem('monsterPet');
+                monster = null;
+                if (statInterval) clearInterval(statInterval);
+                document.getElementById('monsterScreen').classList.remove('show');
+                document.getElementById('eggScreen').classList.remove('hidden');
+                document.getElementById('hallOfFame').classList.remove('show');
+            }
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

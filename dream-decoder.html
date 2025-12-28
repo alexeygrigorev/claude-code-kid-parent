@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌙 Dream Decoder 5000 🌙</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0a0a2e 0%, #1a0a4e 50%, #2a1a5e 100%);
+            color: #e0d0ff;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .floating-stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            color: #ffff00;
+            animation: float 6s ease-in-out infinite;
+            text-shadow: 0 0 10px #ffff00;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.2rem;
+            color: #ddaaff;
+            text-shadow: 0 0 20px #aa66ff, 0 0 40px #8844ff;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #8866cc;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+
+        .crystal-section {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .crystal-ball {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #ddbbff 0%, #9944ff 30%, #5522aa 60%, #331177 100%);
+            box-shadow: 0 0 60px #9944ff, 0 0 100px #7722cc, inset 0 0 50px rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+            animation: mysticGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes mysticGlow {
+            0% { box-shadow: 0 0 60px #9944ff, 0 0 100px #7722cc, inset 0 0 50px rgba(255, 255, 255, 0.3); }
+            100% { box-shadow: 0 0 80px #bb66ff, 0 0 120px #9944ee, inset 0 0 60px rgba(255, 255, 255, 0.4); }
+        }
+
+        .sparkle {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .stand {
+            width: 100px;
+            height: 30px;
+            background: linear-gradient(180deg, #665588 0%, #443366 100%);
+            margin: -10px auto 0;
+            border-radius: 0 0 50px 50px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-section {
+            background: rgba(102, 68, 153, 0.2);
+            border: 2px solid #9966cc;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .input-section label {
+            display: block;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: #cc99ff;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-family: 'Georgia', serif;
+            background: rgba(20, 10, 40, 0.8);
+            border: 2px solid #8844cc;
+            border-radius: 15px;
+            color: #e0d0ff;
+            resize: none;
+            margin-bottom: 15px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #bb88ff;
+            box-shadow: 0 0 20px rgba(136, 68, 204, 0.5);
+        }
+
+        .decode-btn {
+            width: 100%;
+            background: linear-gradient(180deg, #9944ff 0%, #7722cc 100%);
+            color: white;
+            border: 2px solid #cc99ff;
+            padding: 18px;
+            font-size: 1.3rem;
+            font-family: 'Georgia', serif;
+            cursor: pointer;
+            border-radius: 25px;
+            text-shadow: 2px 2px 0 #441166;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(153, 68, 255, 0.4);
+        }
+
+        .decode-btn:hover {
+            background: linear-gradient(180deg, #bb66ff 0%, #9944ff 100%);
+            box-shadow: 0 5px 30px rgba(153, 68, 255, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .decode-btn:active {
+            transform: translateY(1px);
+        }
+
+        .result-section {
+            background: rgba(102, 68, 153, 0.2);
+            border: 2px solid #9966cc;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .interpretation {
+            background: rgba(40, 20, 70, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #ddbbff;
+        }
+
+        .interpretation strong {
+            color: #ffcc00;
+        }
+
+        .luck-section {
+            background: rgba(255, 204, 0, 0.1);
+            border: 2px solid #ffcc00;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .luck-score {
+            font-size: 2rem;
+            color: #ffcc00;
+            margin-bottom: 5px;
+        }
+
+        .luck-rating {
+            color: #ffaa66;
+            font-size: 1rem;
+        }
+
+        .weirdness-section {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .weirdness-label {
+            color: #aa88cc;
+            margin-bottom: 5px;
+        }
+
+        .weirdness-faces {
+            font-size: 2rem;
+            letter-spacing: 5px;
+        }
+
+        .fortune-cookie {
+            background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%);
+            color: #331100;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .fortune-cookie::before {
+            content: '🥠';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5rem;
+        }
+
+        .fortune-text {
+            font-size: 1.1rem;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .dream-journal {
+            background: rgba(102, 68, 153, 0.2);
+            border: 2px solid #9966cc;
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .dream-journal h3 {
+            text-align: center;
+            color: #cc99ff;
+            margin-bottom: 15px;
+        }
+
+        .journal-entry {
+            background: rgba(40, 20, 70, 0.7);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .journal-entry:last-child {
+            margin-bottom: 0;
+        }
+
+        .journal-dream {
+            color: #ddbbff;
+            margin-bottom: 5px;
+        }
+
+        .journal-meta {
+            font-size: 0.8rem;
+            color: #8877aa;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @media (max-width: 500px) {
+            h1 { font-size: 1.6rem; }
+            .crystal-ball { width: 140px; height: 140px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-stars" id="stars"></div>
+
+    <div class="container">
+        <h1>🌙 DREAM DECODER 5000 🌙</h1>
+        <p class="subtitle">Discover what your dreams REALLY mean!</p>
+
+        <div class="crystal-section">
+            <div class="crystal-ball">
+                🔮
+                <span class="sparkle" style="top: 10%; left: 10%;">✨</span>
+                <span class="sparkle" style="top: 20%; right: 5%;">⭐</span>
+                <span class="sparkle" style="bottom: 15%; left: 5%;">💫</span>
+                <span class="sparkle" style="bottom: 10%; right: 15%;">✨</span>
+            </div>
+        </div>
+        <div class="stand"></div>
+
+        <div class="input-section">
+            <label>🌜 Tell me your dream... 🌛</label>
+            <textarea id="dreamInput" placeholder="I was flying on a giant taco over a school made of jello..."></textarea>
+            <button class="decode-btn" onclick="decodeDream()">✨ DECODE MY DREAM ✨</button>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="interpretation" id="interpretation"></div>
+
+            <div class="luck-section">
+                <div class="luck-score" id="luckScore">🍀 DREAM LUCK: 77% 🍀</div>
+                <div class="luck-rating" id="luckRating">Buy a lottery ticket!</div>
+            </div>
+
+            <div class="weirdness-section">
+                <div class="weirdness-label">WEIRDNESS RATING:</div>
+                <div class="weirdness-faces" id="weirdnessFaces">🧟🧟🧟</div>
+            </div>
+
+            <div class="fortune-cookie">
+                <div class="fortune-text" id="fortuneText"></div>
+            </div>
+        </div>
+
+        <div class="dream-journal">
+            <h3>📖 DREAM JOURNAL - Last 10 Dreams 📖</h3>
+            <div id="journalList">
+                <p style="text-align: center; color: #6666aa; font-style: italic;">No dreams recorded yet...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating stars
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 30; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.textContent = ['✨', '⭐', '💫', '🌟'][Math.floor(Math.random() * 4)];
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 6 + 's';
+            star.style.fontSize = (Math.random() * 15 + 10) + 'px';
+            starsContainer.appendChild(star);
+        }
+
+        const interpretations = {
+            flying: 'You secretly want to become a <strong>SUPERHERO</strong> or maybe you just ate too much before bed!',
+            food: 'You are destined to become a <strong>PROFESSIONAL FOOD TASTER</strong> or you\'re just hungry right now!',
+            taco: 'You are destined to become a <strong>PROFESSIONAL FOOD TASTER</strong> or you\'re just hungry right now!',
+            pizza: 'You are destined to become a <strong>PROFESSIONAL FOOD TASTER</strong> or you\'re just hungry right now!',
+            burger: 'You are destined to become a <strong>PROFESSIONAL FOOD TASTER</strong> or you\'re just hungry right now!',
+            icecream: 'You are destined to become a <strong>PROFESSIONAL FOOD TASTER</strong> or you\'re just hungry right now!',
+            ice: 'You are destined to become a <strong>PROFESSIONAL FOOD TASTER</strong> or you\'re just hungry right now!',
+            cream: 'You are destined to become a <strong>PROFESSIONAL FOOD TASTER</strong> or you\'re just hungry right now!',
+            school: 'Your brain is secretly a <strong>GENIUS</strong> or you forgot to do homework and your brain is reminding you!',
+            teacher: 'Your brain is secretly a <strong>GENIUS</strong> or you forgot to do homework and your brain is reminding you!',
+            homework: 'Your brain is secretly a <strong>GENIUS</strong> or you forgot to do homework and your brain is reminding you!',
+            monster: 'You\'re <strong>BRAVER</strong> than you think or you watched too many scary movies!',
+            scary: 'You\'re <strong>BRAVER</strong> than you think or you watched too many scary movies!',
+            ghost: 'You\'re <strong>BRAVER</strong> than you think or you watched too many scary movies!',
+            zombie: 'You\'re <strong>BRAVER</strong> than you think or you watched too many scary movies!',
+            falling: 'You will become a <strong>FALLING CHAMPION</strong> or you need to tuck your blanket in tighter!',
+            fall: 'You will become a <strong>FALLING CHAMPION</strong> or you need to tuck your blanket in tighter!',
+            water: 'You\'re a <strong>MERPERSON</strong> in disguise or you really need to use the bathroom!',
+            ocean: 'You\'re a <strong>MERPERSON</strong> in disguise or you really need to use the bathroom!',
+            swimming: 'You\'re a <strong>MERPERSON</strong> in disguise or you really need to use the bathroom!',
+            swim: 'You\'re a <strong>MERPERSON</strong> in disguise or you really need to use the bathroom!',
+            beach: 'You\'re a <strong>MERPERSON</strong> in disguise or you really need to use the bathroom!',
+            pool: 'You\'re a <strong>MERPERSON</strong> in disguise or you really need to use the bathroom!',
+            animal: 'You can <strong>TALK TO ANIMALS</strong> or you watched too many animal videos!',
+            animals: 'You can <strong>TALK TO ANIMALS</strong> or you watched too many animal videos!',
+            dog: 'You can <strong>TALK TO ANIMALS</strong> or you watched too many animal videos!',
+            cat: 'You can <strong>TALK TO ANIMALS</strong> or you watched too many animal videos!',
+            bird: 'You can <strong>TALK TO ANIMALS</strong> or you watched too many animal videos!',
+            fish: 'You can <strong>TALK TO ANIMALS</strong> or you watched too many animal videos!',
+            video: 'You will become a <strong>VIDEO GAME MASTER</strong> or... play less before bed!',
+            game: 'You will become a <strong>VIDEO GAME MASTER</strong> or... play less before bed!',
+            gaming: 'You will become a <strong>VIDEO GAME MASTER</strong> or... play less before bed!',
+            roblox: 'You will become a <strong>VIDEO GAME MASTER</strong> or... play less before bed!',
+            minecraft: 'You will become a <strong>VIDEO GAME MASTER</strong> or... play less before bed!'
+        };
+
+        const luckRatings = [
+            { min: 90, text: 'EXTREMELY LUCKY!!! Anything is possible!' },
+            { min: 75, text: 'Very lucky! Buy a lottery ticket!' },
+            { min: 60, text: 'Luck is on your side! Go for it!' },
+            { min: 45, text: 'Moderately lucky. Could go either way!' },
+            { min: 30, text: 'A bit unlucky. Watch your step!' },
+            { min: 15, text: 'Not very lucky. Stay inside today!' },
+            { min: 0, text: 'Watch out for banana peels!' }
+        ];
+
+        const fortunes = [
+            'Your lucky number is potato',
+            'Beware of penguins with briefcases',
+            'A surprise will come from the refrigerator',
+            'Your lucky color is "blurple"',
+            'Someone is thinking of you. Probably your pet.',
+            'Avoid sandwich-related accidents today',
+            'Your destiny involves at least 47 tacos',
+            'A purple octopus will bring you good news',
+            'Your lucky food is broccoli. Sorry.',
+            'Fortune favors the weird. You\'re welcome!',
+            'A talking squirrel will change your life',
+            'Your superpower will arrive by mail in 3-5 business days',
+            'Beware of harmless-looking marshmallows',
+            'Your lucky day is every day that ends with Y',
+            'A mystery will be solved. Probably where your other sock went.',
+            'Your future is bright. Wear sunglasses.',
+            'An unexpected adventure awaits. Bring snacks.',
+            'Your lucky animal is the ninja llama',
+            'Someone will give you a high-five today',
+            'Your dreams are trying to tell you something. It\'s probably about tacos.'
+        ];
+
+        let journal = JSON.parse(localStorage.getItem('dreamJournal')) || [];
+
+        function decodeDream() {
+            const dream = document.getElementById('dreamInput').value.trim();
+            if (!dream) return;
+
+            const lower = dream.toLowerCase();
+            let interpretation = '';
+
+            // Find matching keywords
+            for (const [keyword, meaning] of Object.entries(interpretations)) {
+                if (lower.includes(keyword)) {
+                    interpretation = meaning;
+                    break;
+                }
+            }
+
+            // Default interpretation
+            if (!interpretation) {
+                interpretation = 'Your dream is a <strong>MYSTERY</strong> even to the mystics! But it definitely means something <strong>IMPORTANT</strong>... or you just need to eat more snacks before bed!';
+            }
+
+            document.getElementById('interpretation').innerHTML = '🔮 ' + interpretation;
+
+            // Random luck score
+            const luck = Math.floor(Math.random() * 100) + 1;
+            document.getElementById('luckScore').textContent = '🍀 DREAM LUCK: ' + luck + '% 🍀';
+
+            let ratingText = luckRatings.find(r => luck >= r.min).text;
+            document.getElementById('luckRating').textContent = ratingText;
+
+            // Weirdness rating based on dream length and unique words
+            const words = lower.split(/\s+/);
+            const uniqueWords = new Set(words);
+            const weirdness = Math.min(Math.ceil(uniqueWords.size / 3) + Math.floor(Math.random() * 2), 5);
+            document.getElementById('weirdnessFaces').textContent = '🧟'.repeat(weirdness);
+
+            // Fortune
+            document.getElementById('fortuneText').textContent = fortunes[Math.floor(Math.random() * fortunes.length)];
+
+            // Show results
+            document.getElementById('resultSection').classList.add('show');
+
+            // Save to journal
+            const entry = {
+                dream: dream.substring(0, 60) + (dream.length > 60 ? '...' : ''),
+                luck: luck,
+                weirdness: weirdness,
+                date: new Date().toLocaleDateString()
+            };
+
+            journal.unshift(entry);
+            journal = journal.slice(0, 10);
+            localStorage.setItem('dreamJournal', JSON.stringify(journal));
+            updateJournalDisplay();
+
+            // Clear input
+            document.getElementById('dreamInput').value = '';
+        }
+
+        function updateJournalDisplay() {
+            const list = document.getElementById('journalList');
+            if (journal.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #6666aa; font-style: italic;">No dreams recorded yet...</p>';
+                return;
+            }
+
+            list.innerHTML = journal.map(entry => `
+                <div class="journal-entry">
+                    <div class="journal-dream">🌙 "${entry.dream}"</div>
+                    <div class="journal-meta">
+                        <span>🍀 ${entry.luck}% luck</span>
+                        <span>🧟'.repeat(entry.weirdness) + ' weirdness</span>
+                        <span>📅 ${entry.date}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize
+        updateJournalDisplay();
+
+        // Enter key to decode
+        document.getElementById('dreamInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                decodeDream();
+            }
+        });
+    </script>
+</body>
+</html>

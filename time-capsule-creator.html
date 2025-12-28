@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⏰ Time Capsule Creator ⏰</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', 'Courier New', monospace;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0a0a2e 0%, #1a1a4e 50%, #0a0a2e 100%);
+            color: #00ffcc;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            color: #00ffff;
+            text-shadow: 0 0 20px #00ffff, 0 0 40px #0088ff;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #8888ff;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            display: none;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1a1a;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: badgeGlow 1s infinite;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
+        .badge.show {
+            display: block;
+        }
+
+        @keyframes badgeGlow {
+            0%, 100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0 0 50px rgba(255, 215, 0, 0.8); }
+        }
+
+        /* Time Machine */
+        .time-machine {
+            background: linear-gradient(180deg, #2a2a4a 0%, #1a1a3a 100%);
+            border: 4px solid #00ffff;
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 20px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.3);
+        }
+
+        .gears {
+            position: absolute;
+            font-size: 2rem;
+            animation: spin 4s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .gear-1 { top: 15px; left: 15px; }
+        .gear-2 { top: 15px; right: 15px; animation-direction: reverse; }
+        .gear-3 { bottom: 15px; left: 15px; animation-duration: 3s; }
+        .gear-4 { bottom: 15px; right: 15px; animation-direction: reverse; animation-duration: 3s; }
+
+        .lights {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .light {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .light:nth-child(1) { background: #ff0000; animation-delay: 0s; }
+        .light:nth-child(2) { background: #00ff00; animation-delay: 0.2s; }
+        .light:nth-child(3) { background: #0000ff; animation-delay: 0.4s; }
+        .light:nth-child(4) { background: #ffff00; animation-delay: 0.6s; }
+        .light:nth-child(5) { background: #ff00ff; animation-delay: 0.8s; }
+
+        .year-display {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .year-box {
+            text-align: center;
+        }
+
+        .year-label {
+            font-size: 0.7rem;
+            color: #8888ff;
+        }
+
+        .year-value {
+            font-size: 1.5rem;
+            color: #00ffff;
+        }
+
+        .sound-effect {
+            text-align: center;
+            font-size: 1rem;
+            color: #ff00ff;
+            min-height: 25px;
+            margin-bottom: 10px;
+        }
+
+        .input-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .input-section label {
+            display: block;
+            color: #00ff88;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #00ffff;
+            border-radius: 10px;
+            color: #00ffcc;
+            resize: none;
+            margin-bottom: 10px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+
+        select, input[type="number"] {
+            padding: 10px;
+            font-family: 'Orbitron', monospace;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #00ffff;
+            border-radius: 8px;
+            color: #00ffcc;
+            margin-bottom: 10px;
+        }
+
+        select { width: 100%; }
+        input[type="number"] { width: 100px; }
+
+        .send-btn {
+            width: 100%;
+            background: linear-gradient(180deg, #00ffff 0%, #0088ff 100%);
+            color: #000033;
+            border: none;
+            padding: 18px;
+            font-size: 1.2rem;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .send-btn:hover {
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.8);
+            transform: scale(1.02);
+        }
+
+        .templates {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .template-btn {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #00ffff;
+            color: #00ffcc;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .template-btn:hover {
+            background: rgba(0, 255, 255, 0.3);
+        }
+
+        .vault {
+            background: linear-gradient(180deg, #1a1a3a 0%, #2a2a5a 100%);
+            border: 3px solid #8888ff;
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .vault h3 {
+            text-align: center;
+            color: #8888ff;
+            margin-bottom: 15px;
+        }
+
+        .capsule-item {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #4444aa;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .capsule-item.ready {
+            border-color: #00ff88;
+            animation: readyGlow 1s infinite;
+        }
+
+        @keyframes readyGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(0, 255, 136, 0.6); }
+        }
+
+        .capsule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .capsule-lock {
+            font-size: 1.5rem;
+        }
+
+        .capsule-date {
+            color: #8888ff;
+            font-size: 0.8rem;
+        }
+
+        .capsule-code {
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            text-align: center;
+            color: #ff00ff;
+        }
+
+        .capsule-countdown {
+            text-align: center;
+            color: #ffff00;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .unlock-btn {
+            width: 100%;
+            background: linear-gradient(180deg, #00ff88, #00cc66);
+            color: #003300;
+            border: none;
+            padding: 12px;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 10px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .unlock-btn.show {
+            display: block;
+        }
+
+        /* Unlocking ceremony */
+        .ceremony {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+
+        .ceremony.show {
+            display: flex;
+        }
+
+        .time-warp {
+            font-size: 4rem;
+            animation: warp 2s infinite;
+        }
+
+        @keyframes warp {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.5); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .unlocked-message {
+            background: linear-gradient(135deg, #00ffff, #0088ff);
+            color: #000033;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            text-align: center;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .unlocked-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin: 15px 0;
+            font-style: italic;
+        }
+
+        .close-ceremony {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-family: 'Orbitron', monospace;
+            cursor: pointer;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        /* Tips and Predictions */
+        .tips-section {
+            background: rgba(255, 0, 255, 0.1);
+            border: 2px solid #ff00ff;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .tips-section h4 {
+            color: #ff88ff;
+            margin-bottom: 10px;
+        }
+
+        .tip-text {
+            color: #ffaaff;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .prediction-text {
+            color: #ffff00;
+            font-size: 1rem;
+        }
+
+        .parent-override {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .override-btn {
+            background: rgba(255, 100, 100, 0.2);
+            border: 1px solid #ff6666;
+            color: #ff8888;
+            padding: 8px 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .override-btn:hover {
+            background: rgba(255, 100, 100, 0.4);
+        }
+
+        @media (max-width: 500px) {
+            h1 { font-size: 1.5rem; }
+            .year-display { flex-direction: column; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⏰ TIME CAPSULE CREATOR ⏰</h1>
+        <p class="subtitle">Send messages to your future self!</p>
+
+        <div class="badge" id="timeLordBadge">
+            ⏰ TIME LORD BADGE! ⏰<br>
+            You've created 10 time capsules! You are a master of time!
+        </div>
+
+        <div class="time-machine">
+            <div class="gears gear-1">⚙️</div>
+            <div class="gears gear-2">⚙️</div>
+            <div class="gears gear-3">⚙️</div>
+            <div class="gears gear-4">⚙️</div>
+
+            <div class="lights">
+                <div class="light"></div>
+                <div class="light"></div>
+                <div class="light"></div>
+                <div class="light"></div>
+                <div class="light"></div>
+            </div>
+
+            <div class="year-display">
+                <div class="year-box">
+                    <div class="year-label">CURRENT YEAR</div>
+                    <div class="year-value" id="currentYear">2025</div>
+                </div>
+                <div class="year-box">
+                    <div class="year-label">TARGET YEAR</div>
+                    <div class="year-value"><input type="number" id="targetYear" value="2030" min="2025" max="2100"></div>
+                </div>
+            </div>
+
+            <div class="sound-effect" id="soundEffect"></div>
+
+            <div class="input-section">
+                <label>📝 YOUR MESSAGE TO THE FUTURE:</label>
+                <textarea id="messageInput" placeholder="Dear Future Me, do we have flying cars yet?"></textarea>
+
+                <label>👤 WHO ARE YOU?</label>
+                <select id="whoAmI">
+                    <option value="kid">🧒 Kid Mode</option>
+                    <option value="teen">🧑 Teen Mode</option>
+                    <option value="adult">👨 Adult Mode</option>
+                </select>
+
+                <div class="templates">
+                    <button class="template-btn" onclick="useTemplate(0)">"Flying cars?"</button>
+                    <button class="template-btn" onclick="useTemplate(1)">"What's my job?"</button>
+                    <button class="template-btn" onclick="useTemplate(2)">"Best memory?"</button>
+                    <button class="template-btn" onclick="useTemplate(3)">"Dreams came true?"</button>
+                </div>
+
+                <button class="send-btn" onclick="sendToFuture()">🚀 SEND TO THE FUTURE! 🚀</button>
+            </div>
+        </div>
+
+        <div class="tips-section">
+            <h4>🔮 FUTURE PREDICTION</h4>
+            <div class="prediction-text" id="prediction"></div>
+        </div>
+
+        <div class="tips-section">
+            <h4>⚠️ TIME TRAVEL TIPS</h4>
+            <div class="tip-text" id="tipText"></div>
+        </div>
+
+        <div class="vault">
+            <h3>🗄️ THE FUTURE VAULT 🗄️</h3>
+            <div id="vaultList">
+                <p style="text-align: center; color: #4444aa; font-style: italic;">No messages yet. Send one to the future!</p>
+            </div>
+            <div class="parent-override">
+                <button class="override-btn" onclick="unlockAllForTesting()">🔓 Parent Override (unlock all for testing)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unlocking Ceremony -->
+    <div class="ceremony" id="ceremony">
+        <div class="time-warp">🌀</div>
+        <div class="unlocked-message">
+            <h2 style="color: #000033;">⏰ MESSAGE FROM THE PAST! ⏰</h2>
+            <div style="color: #003300; font-size: 0.9rem;" id="unlockedMeta"></div>
+            <div class="unlocked-text" id="unlockedText"></div>
+            <button class="close-ceremony" onclick="closeCeremony()">Return to Present</button>
+        </div>
+    </div>
+
+    <script>
+        const currentYear = new Date().getFullYear();
+        document.getElementById('currentYear').textContent = currentYear;
+        document.getElementById('targetYear').value = currentYear + 5;
+
+        const templates = [
+            "Dear Future Me, do we have flying cars yet? If not, WHAT TAKES SO LONG?!",
+            "Dear Future Me, what's your job? Is it awesome like I hope?",
+            "Dear Future Me, what's your favorite memory from when you were little?",
+            "Dear Future Me, did your dreams come true? Tell me everything!"
+        ];
+
+        const predictions = [
+            `In ${currentYear + 5}, everyone will wear hats made of cheese! 🧀`,
+            `In ${currentYear + 10, pizza will grow on trees! 🌲`,
+            `By ${currentYear + 7}, dogs will learn to talk and they'll be VERY rude! 🐕`,
+            `In ${currentYear + 3}, teleporters will replace stairs! ⚡`,
+            `By ${currentYear + 15, the moon will become a popular vacation spot! 🌙`,
+            `In ${currentYear + 5, robots will do all homework (but they'll complain about it)! 🤖`
+        ];
+
+        const tips = [
+            "Don't meet your past self or the universe EXPLODES! 💥",
+            "Never bring future technology to the past. It creates paradoxes! 🌀",
+            "Always remember: the future can be changed (probably, maybe, don't risk it)! ⚠️",
+            "Time travel makes you VERY hungry. Pack snacks! 🍕",
+            "Don't step on any butterflies in the past! 🦋",
+            "If you meet yourself, pretend to be a long-lost twin! 👯"
+        ];
+
+        const futureCodes = ['⏳', '🔒', '💫', '⭐', '🌙', '🔐', '🎭', '⏰', '🌌', '🚀', '💎', '🔮', '🎪', '🎨', '🎭'];
+
+        let capsules = JSON.parse(localStorage.getItem('timeCapsules')) || [];
+
+        // Initialize
+        showRandomPrediction();
+        showRandomTip();
+        updateVault();
+
+        function useTemplate(index) {
+            document.getElementById('messageInput').value = templates[index];
+        }
+
+        function showRandomPrediction() {
+            const prediction = predictions[Math.floor(Math.random() * predictions.length)];
+            document.getElementById('prediction').textContent = prediction;
+        }
+
+        function showRandomTip() {
+            const tip = tips[Math.floor(Math.random() * tips.length)];
+            document.getElementById('tipText').textContent = tip;
+        }
+
+        function playSound() {
+            const sounds = ['*WHIRRRR*', '*BEEP BOOP*', '*ZZZAP!*', '*WOOSH!*', '*TIMESHIFT*'];
+            document.getElementById('soundEffect').textContent = sounds[Math.floor(Math.random() * sounds.length)];
+        }
+
+        function generateFutureCode(length) {
+            let code = '';
+            for (let i = 0; i < length; i++) {
+                code += futureCodes[Math.floor(Math.random() * futureCodes.length)];
+            }
+            return code;
+        }
+
+        function sendToFuture() {
+            const message = document.getElementById('messageInput').value.trim();
+            const targetYear = parseInt(document.getElementById('targetYear').value);
+            const whoAmI = document.getElementById('whoAmI').value;
+
+            if (!message) {
+                document.getElementById('soundEffect').textContent = '*ERROR: Message empty!*';
+                return;
+            }
+
+            if (targetYear <= currentYear) {
+                document.getElementById('soundEffect').textContent = '*ERROR: Pick a future year!*';
+                return;
+            }
+
+            playSound();
+
+            const capsule = {
+                id: Date.now(),
+                message: message,
+                created: new Date().toISOString(),
+                targetYear: targetYear,
+                whoAmI: whoAmI,
+                code: generateFutureCode(10),
+                unlocked: false
+            };
+
+            capsules.unshift(capsule);
+            localStorage.setItem('timeCapsules', JSON.stringify(capsules));
+
+            document.getElementById('messageInput').value = '';
+            updateVault();
+
+            document.getElementById('soundEffect').textContent = '*MESSAGE SENT TO ' + targetYear + '!*';
+        }
+
+        function updateVault() {
+            const list = document.getElementById('vaultList');
+
+            if (capsules.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #4444aa; font-style: italic;">No messages yet. Send one to the future!</p>';
+                return;
+            }
+
+            list.innerHTML = capsules.map(capsule => {
+                const now = new Date();
+                const targetDate = new Date(capsule.targetYear, 0, 1);
+                const isReady = now >= targetDate || capsule.unlocked;
+                const daysUntil = Math.ceil((targetDate - now) / (1000 * 60 * 60 * 24));
+
+                return `
+                    <div class="capsule-item ${isReady ? 'ready' : ''}">
+                        <div class="capsule-header">
+                            <span class="capsule-lock">${isReady ? '🔓' : '🔒'}</span>
+                            <span class="capsule-date">Created: ${new Date(capsule.created).toLocaleDateString()}</span>
+                        </div>
+                        <div class="capsule-code">${capsule.code}</div>
+                        ${!isReady ? `<div class="capsule-countdown">Unlocks in: ${capsule.targetYear} (${daysUntil > 0 ? daysUntil + ' days' : 'soon!'})</div>` : ''}
+                        <button class="unlock-btn ${isReady ? 'show' : ''}" onclick="unlockCapsule(${capsule.id})">🔓 UNLOCK MESSAGE</button>
+                    </div>
+                `;
+            }).join('');
+
+            // Check badge
+            if (capsules.length >= 10) {
+                document.getElementById('timeLordBadge').classList.add('show');
+            }
+        }
+
+        function unlockCapsule(id) {
+            const capsule = capsules.find(c => c.id === id);
+            if (!capsule) return;
+
+            const now = new Date();
+            const targetDate = new Date(capsule.targetYear, 0, 1);
+
+            if (now < targetDate && !capsule.unlocked) {
+                document.getElementById('soundEffect').textContent = '*ERROR: Not time yet!*';
+                return;
+            }
+
+            // Show ceremony
+            const ceremony = document.getElementById('ceremony');
+            ceremony.classList.add('show');
+
+            const createdDate = new Date(capsule.created);
+            const ageThen = getAge(capsule.whoAmI, createdDate);
+            const ageNow = getAge(capsule.whoAmI, now);
+            const ageDiff = ageNow - ageThen;
+
+            document.getElementById('unlockedMeta').innerHTML = `
+                From: ${createdDate.toLocaleDateString()}<br>
+                Target Year: ${capsule.targetYear}<br>
+                You were: ${ageThen} years old then<br>
+                Age difference: ${ageDiff} years
+            `;
+
+            document.getElementById('unlockedText').textContent = capsule.message;
+
+            // Mark as unlocked
+            capsule.unlocked = true;
+            localStorage.setItem('timeCapsules', JSON.stringify(capsules));
+        }
+
+        function getAge(mode, date) {
+            const birthYear = date.getFullYear();
+            if (mode === 'kid') return birthYear - currentYear + 8;
+            if (mode === 'teen') return birthYear - currentYear + 15;
+            return birthYear - currentYear + 30;
+        }
+
+        function closeCeremony() {
+            document.getElementById('ceremony').classList.remove('show');
+        }
+
+        function unlockAllForTesting() {
+            const password = prompt("Enter parent password (hint: it's 'future'):");
+            if (password === 'future') {
+                capsules.forEach(c => c.unlocked = true);
+                localStorage.setItem('timeCapsules', JSON.stringify(capsules));
+                updateVault();
+                document.getElementById('soundEffect').textContent = '*ALL UNLOCKED FOR TESTING!*';
+            } else {
+                document.getElementById('soundEffect').textContent = '*ACCESS DENIED!*';
+            }
+        }
+
+        // Update countdowns every minute
+        setInterval(updateVault, 60000);
+    </script>
+</body>
+</html>

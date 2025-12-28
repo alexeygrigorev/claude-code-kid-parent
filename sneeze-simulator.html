@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤧 SNEEZE-ON-DEMAND SIMULATOR!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #ff6b6b;
+            text-shadow: 3px 3px 0 #fff;
+            margin-bottom: 10px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .btn {
+            font-size: 1.5rem;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Comic Sans MS', cursive;
+            transition: transform 0.1s, box-shadow 0.1s;
+            font-weight: bold;
+        }
+
+        .btn-sneeze {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+            color: white;
+            box-shadow: 0 6px 0 #c44;
+        }
+
+        .btn-sneeze:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #c44;
+        }
+
+        .btn-sneeze:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #c44;
+        }
+
+        .btn-hold {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            box-shadow: 0 6px 0 #2d7a6e;
+        }
+
+        .btn-hold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #2d7a6e;
+        }
+
+        .btn-hold:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #2d7a6e;
+        }
+
+        .sneeze-result {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: none;
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .sneeze-result.show {
+            display: block;
+        }
+
+        .power-bar {
+            height: 30px;
+            background: linear-gradient(to right, #00ff00, #ffff00, #ff9900, #ff0000);
+            border-radius: 15px;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .power-indicator {
+            position: absolute;
+            top: -5px;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: 4px solid #333;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: left 0.3s ease;
+        }
+
+        .stat {
+            background: #f8f9fa;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .stat-value {
+            color: #333;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .sprayed {
+            font-size: 2rem;
+            margin: 10px 0;
+            animation: wiggle 0.5s ease infinite;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        .sound {
+            font-size: 1.5rem;
+            color: #ff6b6b;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .counter {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            display: inline-block;
+            font-size: 1.2rem;
+            margin: 15px 0;
+        }
+
+        .hold-game {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .hold-game.show {
+            display: block;
+        }
+
+        .timer {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin: 20px 0;
+        }
+
+        .timer.warning {
+            animation: pulse 0.3s infinite;
+            color: #ff0000;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .shake {
+            animation: shake 0.1s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-1deg); }
+            75% { transform: translateX(5px) rotate(1deg); }
+        }
+
+        .dont-do-it {
+            font-size: 1.8rem;
+            color: #ff6b6b;
+            font-weight: bold;
+            animation: wiggle 0.2s infinite;
+        }
+
+        .rank-reveal {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px 0;
+            display: none;
+            animation: popIn 0.5s ease-out;
+        }
+
+        .rank-reveal.show {
+            display: block;
+        }
+
+        .rank-title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .rank-description {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .particles {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .particle {
+            position: absolute;
+            font-size: 2rem;
+            animation: fall 2s ease-out forwards;
+        }
+
+        @keyframes fall {
+            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(300px) rotate(720deg); }
+        }
+
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: all 0.3s;
+        }
+
+        .dot.filled {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transform: scale(1.2);
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #a8a8a8, #888);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        .reset-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤧 SNEEZE-ON-DEMAND SIMULATOR!</h1>
+        <p class="subtitle">Discover your TRUE sneeze potential!</p>
+
+        <div class="buttons">
+            <button class="btn btn-sneeze" onclick="sneeze()">ACHOO!</button>
+            <button class="btn btn-hold" onclick="startHoldIt()">Hold It In...</button>
+        </div>
+
+        <div class="counter">
+            Sneezes: <span id="sneezeCount">0</span>/10
+        </div>
+
+        <div class="progress-dots" id="progressDots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+
+        <div class="sneeze-result" id="sneezeResult"></div>
+
+        <div class="hold-game" id="holdGame">
+            <h2 style="color: #ff6b6b; margin-bottom: 15px;">⚠️ HOLD IT IN CHALLENGE ⚠️</h2>
+            <div class="timer" id="timer">5.00</div>
+            <div class="dont-do-it">DON'T DO IT...</div>
+            <p style="margin-top: 15px; color: #666;">Survive without sneezing!</p>
+        </div>
+
+        <div class="rank-reveal" id="rankReveal"></div>
+    </div>
+
+    <div class="particles" id="particles"></div>
+
+    <script>
+        let sneezeCount = 0;
+        let totalScore = 0;
+        const maxSneezes = 10;
+        let holdInterval = null;
+        let isPlayingHoldGame = false;
+
+        const powers = [
+            { name: "Tiny Squeak", min: 1, max: 10 },
+            { name: "Mouse Whisper", min: 11, max: 20 },
+            { name: "Polite Chirp", min: 21, max: 35 },
+            { name: "Standard Blast", min: 36, max: 50 },
+            { name: "Respectable Boom", min: 51, max: 65 },
+            { name: "Room-Clearer", min: 66, max: 80 },
+            { name: "Thunder Strike", min: 81, max: 90 },
+            { name: "Sonic Boom", min: 91, max: 97 },
+            { name: "Hurricane Force", min: 98, max: 100 }
+        ];
+
+        const sprayed = [
+            { emoji: "🎊", name: "confetti" },
+            { emoji: "✨", name: "glitter" },
+            { emoji: "🌈", name: "rainbows" },
+            { emoji: "🕷️", name: "spiders" },
+            { emoji: "🍡", name: "marshmallows" },
+            { emoji: "⭐", name: "star dust" },
+            { emoji: "🍕", name: "pizza sprinkles" },
+            { emoji: "💎", name: "diamonds" },
+            { emoji: "🦋", name: "butterflies" },
+            { emoji: "🎈", name: "balloons" },
+            { emoji: "🍩", name: "donut glaze" },
+            { emoji: "🔔", name: "jingle bells" },
+            { emoji: "🍀", name: "lucky clovers" },
+            { emoji: "💫", name: "magic sparkles" },
+            { emoji: "🧁", name: "cupcake frosting" }
+        ];
+
+        const sounds = [
+            "KER-CHOO!", "AH-CHOO-ka-choo!", "Aaaa-CHOO!", "CHOO-pow!",
+            "SCH-nap!", "HAT-CHOO!", "CHOOOOOO!", "A-CHOO-CHOO!",
+            "SQUEAK-choo!", "BOOM-choo!", "ZIP-CHOO!", "AH-ah-ah-CHOO!",
+            "CHOO-splash!", "KA-POW-choo!", "meep-CHOO!", "sniffle-CHOO!"
+        ];
+
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function randomFloat(min, max) {
+            return (Math.random() * (max - min) + min).toFixed(2);
+        }
+
+        function getPowerLevel() {
+            const roll = randomInt(1, 100);
+            for (const power of powers) {
+                if (roll >= power.min && roll <= power.max) {
+                    return power;
+                }
+            }
+            return powers[powers.length - 1];
+        }
+
+        function sneeze() {
+            if (sneezeCount >= maxSneezes) {
+                resetSneezes();
+            }
+
+            const power = getPowerLevel();
+            const spray = sprayed[randomInt(0, sprayed.length - 1)];
+            const distance = randomFloat(0.5, 15.5);
+            const sound = sounds[randomInt(0, sounds.length - 1)];
+            const awkwardness = randomInt(1, 10);
+
+            // Calculate score
+            const score = Math.floor((power.max / 100) * 50 + parseFloat(distance) * 5 + awkwardness * 3);
+            totalScore += score;
+            sneezeCount++;
+
+            // Update UI
+            document.getElementById('sneezeCount').textContent = sneezeCount;
+            updateProgressDots();
+
+            // Show result
+            const resultDiv = document.getElementById('sneezeResult');
+            const powerPercent = ((power.min + power.max) / 2);
+            resultDiv.innerHTML = `
+                <div class="sound">${sound}</div>
+                <div class="sprayed">${spray.emoji.repeat(8)}</div>
+                <div class="stat">
+                    <div class="stat-label">POWER LEVEL</div>
+                    <div class="stat-value">${power.name}</div>
+                    <div class="power-bar">
+                        <div class="power-indicator" style="left: calc(${powerPercent}% - 20px)">💪</div>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">WHAT GOT SPRAYED</div>
+                    <div class="stat-value">${spray.emoji} ${spray.name.toUpperCase()}</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">DISTANCE TRAVELED</div>
+                    <div class="stat-value">${distance} meters 📏</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">AWKWARDNESS RATING</div>
+                    <div class="stat-value">${"😳".repeat(awkwardness)} ${awkwardness}/10</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">THIS SNEEZE SCORE</div>
+                    <div class="stat-value">+${score} points</div>
+                </div>
+            `;
+            resultDiv.classList.add('show');
+
+            // Spawn particles
+            spawnParticles(spray.emoji);
+
+            // Check for rank reveal
+            if (sneezeCount >= maxSneezes) {
+                setTimeout(showRank, 1000);
+            }
+        }
+
+        function spawnParticles(emoji) {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.textContent = emoji;
+                particle.style.left = randomInt(10, 90) + '%';
+                particle.style.top = randomInt(10, 50) + '%';
+                particle.style.animationDuration = randomFloat(1, 2) + 's';
+                container.appendChild(particle);
+                setTimeout(() => particle.remove(), 2000);
+            }
+        }
+
+        function updateProgressDots() {
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, index) => {
+                if (index < sneezeCount) {
+                    dot.classList.add('filled');
+                } else {
+                    dot.classList.remove('filled');
+                }
+            });
+        }
+
+        function showRank() {
+            const avgScore = totalScore / maxSneezes;
+            let rank, description, emoji;
+
+            if (avgScore >= 80) {
+                rank = "LEGENDARY SNEEZELORD";
+                description = "Your sneezes are the stuff of LEGENDS! People tell stories about your sneezes around campfires!";
+                emoji = "👑🤧👑";
+            } else if (avgScore >= 60) {
+                rank = "MASTER SNEEZER";
+                description = "Impressive! You've achieved sneeze mastery few ever attain!";
+                emoji = "🏆🤧🏆";
+            } else if (avgScore >= 40) {
+                rank = "PROFESSIONAL SNEEZER";
+                description = "Solid work! You're a dependable sneezer in any situation!";
+                emoji = "⭐🤧⭐";
+            } else if (avgScore >= 25) {
+                rank = "APPRENTICE SNEEZER";
+                description = "You're learning! With practice, you could achieve sneeze greatness!";
+                emoji = "📚🤧📚";
+            } else {
+                rank = "SNEEZE IN TRAINING";
+                description = "Every master starts somewhere! Keep sneezing, keep believing!";
+                emoji = "🌱🤧🌱";
+            }
+
+            const rankDiv = document.getElementById('rankReveal');
+            rankDiv.innerHTML = `
+                <div class="rank-title">${emoji}</div>
+                <div class="rank-title">${rank}</div>
+                <div class="rank-description">${description}</div>
+                <div style="margin-top: 15px; font-size: 1.1rem;">Total Score: ${totalScore} points</div>
+                <button class="reset-btn" onclick="resetAll()">Play Again!</button>
+            `;
+            rankDiv.classList.add('show');
+        }
+
+        function resetSneezes() {
+            sneezeCount = 0;
+            totalScore = 0;
+            document.getElementById('sneezeCount').textContent = '0';
+            updateProgressDots();
+            document.getElementById('sneezeResult').classList.remove('show');
+            document.getElementById('rankReveal').classList.remove('show');
+        }
+
+        function resetAll() {
+            resetSneezes();
+        }
+
+        function startHoldIt() {
+            if (isPlayingHoldGame) return;
+            isPlayingHoldGame = true;
+
+            const holdGame = document.getElementById('holdGame');
+            const timer = document.getElementById('timer');
+            const body = document.body;
+
+            holdGame.classList.add('show');
+            document.getElementById('sneezeResult').classList.remove('show');
+
+            let timeLeft = 5.00;
+            timer.textContent = timeLeft.toFixed(2);
+            timer.classList.remove('warning');
+
+            let shakeStarted = false;
+
+            holdInterval = setInterval(() => {
+                timeLeft -= 0.02;
+                timer.textContent = Math.max(0, timeLeft).toFixed(2);
+
+                if (timeLeft <= 2 && !shakeStarted) {
+                    shakeStarted = true;
+                    timer.classList.add('warning');
+                    body.classList.add('shake');
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(holdInterval);
+                    body.classList.remove('shake');
+                    holdGame.innerHTML = `
+                        <h2 style="color: #4ecdc4; font-size: 2rem;">🎉 YOU DID IT! 🎉</h2>
+                        <p style="font-size: 1.3rem; color: #555;">You successfully held in your sneeze!</p>
+                        <p style="font-size: 1.5rem; margin-top: 10px;">👏 INCREDIBLE SELF CONTROL! 👏</p>
+                        <button class="reset-btn" onclick="resetHoldGame()">Try Again</button>
+                    `;
+                    isPlayingHoldGame = false;
+                }
+            }, 20);
+        }
+
+        function resetHoldGame() {
+            document.getElementById('holdGame').classList.remove('show');
+            document.getElementById('holdGame').innerHTML = `
+                <h2 style="color: #ff6b6b; margin-bottom: 15px;">⚠️ HOLD IT IN CHALLENGE ⚠️</h2>
+                <div class="timer" id="timer">5.00</div>
+                <div class="dont-do-it">DON'T DO IT...</div>
+                <p style="margin-top: 15px; color: #666;">Survive without sneezing!</p>
+            `;
+            document.body.classList.remove('shake');
+        }
+    </script>
+</body>
+</html>

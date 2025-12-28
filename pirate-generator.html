@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏴‍☠️ Pirate Name Generator & Treasure Map</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #f4e4ba;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            color: #ffd700;
+            text-shadow: 3px 3px 0 #8b4513;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #cd853f;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            background: rgba(139, 69, 19, 0.3);
+            border: 3px solid #8b4513;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            font-family: 'Courier New', monospace;
+            background: #2a2a4a;
+            border: 2px solid #cd853f;
+            color: #f4e4ba;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background: linear-gradient(180deg, #8b4513 0%, #654321 100%);
+            color: #ffd700;
+            border: 2px solid #ffd700;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        button:hover {
+            background: linear-gradient(180deg, #a0522d 0%, #8b4513 100%);
+        }
+
+        .result {
+            background: #0a1628;
+            border: 2px dashed #ffd700;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 5px;
+            text-align: center;
+            min-height: 60px;
+        }
+
+        .pirate-name {
+            font-size: 1.5rem;
+            color: #00ff00;
+        }
+
+        .parrot-info {
+            color: #ff6b6b;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+
+        .treasure-map {
+            background: #c4a35a;
+            color: #1a1a1a;
+            padding: 20px;
+            font-size: 0.9rem;
+            line-height: 1.2;
+            overflow-x: auto;
+            white-space: pre;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .stats {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .pirate-count {
+            font-size: 1.2rem;
+            color: #ffd700;
+        }
+
+        .badge {
+            display: none;
+            text-align: center;
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            color: #1a1a1a;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            animation: glow 1s ease infinite;
+        }
+
+        .badge.show {
+            display: block;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px #ffd700; }
+            50% { box-shadow: 0 0 40px #ffd700, 0 0 60px #ff8c00; }
+        }
+
+        .crown {
+            font-size: 3rem;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .fearsome {
+            color: #ff4444;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏴‍☠️ PIRATE NAME GENERATOR 🏴‍☠️</h1>
+        <p class="subtitle">~ Transform yer boring self into a proper sea dog! ~</p>
+
+        <div class="badge" id="badge">
+            <span class="crown">👑</span><br>
+            PIRATE KING/QUEEN UNLOCKED!<br>
+            Ye be a legendary pirate!
+        </div>
+
+        <div class="stats">
+            <span class="pirate-count">Pirates Created: <span id="pirateCount">0</span>/10</span>
+        </div>
+
+        <div class="section">
+            <h2>⚔️ YER PIRATE IDENTITY ⚔️</h2>
+            <input type="text" id="nameInput" placeholder="Enter yer boring name here...">
+            <button onclick="generatePirate()">⚔️ TRANSFORM ME TO PIRATE ⚔️</button>
+            <div class="result" id="pirateResult">Yer pirate identity awaits, matey!</div>
+            <div class="treasure-map" id="treasureMap"></div>
+        </div>
+
+        <div class="section">
+            <h2>🦜 PIRATE SPEAK TRANSLATOR 🦜</h2>
+            <textarea id="normalInput" placeholder="Type normal sentences here..."></textarea>
+            <button onclick="translateToPirate()">Translate to Pirate</button>
+            <div class="result" id="pirateTranslation">Yer pirate translation will appear here!</div>
+        </div>
+    </div>
+
+    <script>
+        let piratesCreated = parseInt(localStorage.getItem('piratesCreated')) || 0;
+        document.getElementById('pirateCount').textContent = piratesCreated;
+
+        if (piratesCreated >= 10) {
+            document.getElementById('badge').classList.add('show');
+        }
+
+        const titles = ['Captain', 'Commodore', 'Scallywag', 'Sea Dog', 'Landlubber', 'Buccaneer', 'Privateer', 'Swashbuckler'];
+        const surnames = ['Beard', 'Iron-Eye', 'Storm-Bringer', 'Shark-Bait', 'Treasure-Hunter', 'Wave-Walker', 'Ocean-Tamer', 'Skull-Cracker', 'Salt-Lover', 'Rope-Swinger'];
+        const parrots = ['Polly', 'Squawks', 'Captain Feathers', 'Saltine', 'Crackers', 'Scurvy', 'Jolly Roger', 'Bird-beard'];
+
+        const interjections = ['Arrr!', 'Shiver me timbers!', 'Blimey!', 'Yo ho ho!', 'Ahoy there!', 'By Blackbeard\'s ghost!'];
+
+        function generatePirate() {
+            const name = document.getElementById('nameInput').value.trim();
+            if (!name) {
+                document.getElementById('pirateResult').innerHTML = '<span style="color: #ff6b6b;">Ye need to enter a name, ye scallywag!</span>';
+                return;
+            }
+
+            const title = titles[Math.floor(Math.random() * titles.length)];
+            const surname = surnames[Math.floor(Math.random() * surnames.length)];
+            let pirateName = `${title} ${name} ${surname}`;
+
+            let result = `<div class="pirate-name">`;
+            let parrotInfo = '';
+
+            // Check for "E" in name
+            if (name.toLowerCase().includes('e')) {
+                pirateName += ` <span class="fearsome">THE FEARSOME</span>`;
+            }
+
+            result += pirateName + `</div>`;
+
+            // Check for parrot
+            if (name.length > 5) {
+                const parrot = parrots[Math.floor(Math.random() * parrots.length)];
+                parrotInfo = `<div class="parrot-info">🦜 Yer loyal parrot companion: ${parrot}!</div>`;
+            }
+
+            // Distance to treasure
+            const distance = name.length * 7 + Math.floor(Math.random() * 13);
+
+            // Generate treasure map
+            const map = generateTreasureMap(distance);
+
+            document.getElementById('pirateResult').innerHTML = result + parrotInfo;
+            document.getElementById('treasureMap').innerHTML = map;
+
+            // Update counter
+            piratesCreated++;
+            localStorage.setItem('piratesCreated', piratesCreated);
+            document.getElementById('pirateCount').textContent = piratesCreated;
+
+            if (piratesCreated >= 10) {
+                document.getElementById('badge').classList.add('show');
+            }
+        }
+
+        function generateTreasureMap(distance) {
+            const width = 30;
+            const height = 15;
+
+            // Random X position (but not on edges)
+            const x = Math.floor(Math.random() * (width - 8)) + 4;
+            const y = Math.floor(Math.random() * (height - 6)) + 3;
+
+            let map = `╔${'═'.repeat(width - 2)}╗\n`;
+
+            for (let row = 0; row < height - 2; row++) {
+                map += '║';
+                for (let col = 0; col < width - 2; col++) {
+                    if (row === y && col === x) {
+                        map += 'X';
+                    } else if (row === 1 && col === 2) {
+                        map += '~)'; // Boat
+                        col++; // Skip next char
+                    } else if (Math.random() < 0.03) {
+                        map += '🌴';
+                    } else if (Math.random() < 0.02) {
+                        map += '∿'; // Waves
+                    } else if (row === y - 1 && col === x) {
+                        map += '📍';
+                    } else {
+                        map += '·';
+                    }
+                }
+                map += '║\n';
+            }
+
+            map += `╚${'═'.repeat(width - 2)}╝\n`;
+            map += `\n  ~)~ Yer Ship          X TREASURE!\n`;
+            map += `  🌴=Palm Tree    📍=Marker\n`;
+            map += `  ⚓ Ye be ${distance} paces from glory! ⚓`;
+
+            return map;
+        }
+
+        function translateToPirate() {
+            const text = document.getElementById('normalInput').value.trim();
+            if (!text) {
+                document.getElementById('pirateTranslation').innerHTML = '<span style="color: #ff6b6b;">Type something first, ye landlubber!</span>';
+                return;
+            }
+
+            let translation = text.toLowerCase();
+
+            // Word replacements
+            const replacements = {
+                'hello': 'ahoy',
+                'hi': 'ahoy',
+                'yes': 'aye',
+                'yeah': 'aye',
+                'yep': 'aye',
+                'no': 'nay',
+                'nope': 'nay',
+                'friend': 'matey',
+                'friends': 'mateys',
+                'my': 'me',
+                'you': 'ye',
+                'your': 'yer',
+                'is': 'be',
+                'are': 'be',
+                'am': 'be',
+                'the': 'th\'',
+                'there': 'thar',
+                'hey': 'ahoy',
+                'food': 'grub',
+                'drink': 'grog',
+                'money': 'doubloons',
+                'gold': 'booty',
+                'treasure': 'booty',
+                'bathroom': 'head',
+                'toilet': 'head',
+                'ship': 'vessel',
+                'boat': 'vessel',
+                'swim': 'swim wit\' th\' fishes',
+                'run': 'make haste',
+                'walk': 'march',
+                'stop': 'belay',
+                'please': 'pray',
+                'thank': 'thanks',
+                'thanks': 'much obliged',
+                'excuse': 'pardon',
+                'sorry': 'me apologies',
+                'good': 'grand',
+                'bad': 'bilge',
+                'cool': 'jolly good',
+                'awesome': 'splendid',
+                'scary': 'fearsome',
+                'crazy': 'mad',
+                'stupid': 'addled'
+            };
+
+            // Apply replacements
+            for (const [normal, pirate] of Object.entries(replacements)) {
+                const regex = new RegExp(`\\b${normal}\\b`, 'gi');
+                translation = translation.replace(regex, pirate);
+            }
+
+            // Capitalize first letter
+            translation = translation.charAt(0).toUpperCase() + translation.slice(0, 1) + translation.slice(1);
+
+            // Add random interjection
+            const interjection = interjections[Math.floor(Math.random() * interjections.length)];
+            translation += ` ${interjection}`;
+
+            document.getElementById('pirateTranslation').innerHTML = `<span style="color: #00ff00;">${translation}</span>`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎤 Silly Sports Commentator 3000 🎤</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1a472a 0%, #2d5a3d 50%, #1a472a 100%);
+            color: white;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #ffcc00;
+            text-shadow: 3px 3px 0 #000, 0 0 20px #ffcc00;
+            margin-bottom: 10px;
+            animation: titlePulse 2s infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #00ccff;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .booth {
+            background: linear-gradient(180deg, #8B4513 0%, #654321 100%);
+            border: 4px solid #ffcc00;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .booth::before {
+            content: '🎤 SPORTS COMMENTATOR BOOTH 🎤';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff6600;
+            color: white;
+            padding: 5px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .microphone {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .mic {
+            width: 60px;
+            height: 100px;
+            background: linear-gradient(180deg, #333 0%, #111 100%);
+            border-radius: 30px 30px 10px 10px;
+            position: relative;
+            animation: pulse 1s infinite;
+        }
+
+        .mic-head {
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, #666 0%, #333 100%);
+            border-radius: 50%;
+            position: absolute;
+            top: -25px;
+            left: 5px;
+            border: 3px solid #888;
+        }
+
+        .mic-stand {
+            width: 8px;
+            height: 80px;
+            background: linear-gradient(180deg, #666 0%, #333 100%);
+            position: absolute;
+            bottom: -70px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px #ff0000; }
+            50% { box-shadow: 0 0 40px #ff0000, 0 0 60px #ff6600; }
+        }
+
+        .input-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            border: 3px solid #00ccff;
+            border-radius: 10px;
+            color: white;
+            resize: none;
+            margin-bottom: 15px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #ffcc00;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+        }
+
+        .announce-btn {
+            width: 100%;
+            background: linear-gradient(180deg, #ff6600 0%, #cc4400 100%);
+            color: white;
+            border: none;
+            padding: 20px;
+            font-size: 1.5rem;
+            font-family: 'Impact', sans-serif;
+            cursor: pointer;
+            border-radius: 15px;
+            text-shadow: 2px 2px 0 #000;
+            transition: all 0.3s;
+        }
+
+        .announce-btn:hover {
+            background: linear-gradient(180deg, #ff8833 0%, #ff6600 100%);
+            transform: scale(1.02);
+        }
+
+        .excitement-meter {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .excitement-label {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #ffcc00;
+        }
+
+        .excitement-bar-container {
+            height: 40px;
+            background: #222;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .excitement-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00 0%, #ffff00 50%, #ff0000 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 20px;
+        }
+
+        .excitement-number {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .excitement-emoji {
+            text-align: center;
+            font-size: 3rem;
+            margin-top: 10px;
+        }
+
+        .commentary-display {
+            background: linear-gradient(180deg, #001a33 0%, #003366 100%);
+            border: 4px solid #00ccff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .commentary-display::before {
+            content: 'LIVE';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff0000;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .commentary-text {
+            font-size: 1.3rem;
+            line-height: 1.6;
+        }
+
+        .sound-effect {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #ffcc00;
+            min-height: 40px;
+            margin-bottom: 15px;
+            font-style: italic;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .replay-btn {
+            width: 100%;
+            background: linear-gradient(180deg, #ff00ff 0%, #cc00cc 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-family: 'Impact', sans-serif;
+            cursor: pointer;
+            border-radius: 10px;
+            text-shadow: 2px 2px 0 #000;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .replay-btn.show {
+            display: block;
+        }
+
+        .replay-btn:hover {
+            background: linear-gradient(180deg, #ff33ff 0%, #ff00ff 100%);
+        }
+
+        .hall-of-fame {
+            background: linear-gradient(180deg, #332200 0%, #553300 100%);
+            border: 4px solid #ffcc00;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .hall-of-fame h3 {
+            text-align: center;
+            color: #ffcc00;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .fame-entry {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .fame-entry:last-child {
+            margin-bottom: 0;
+        }
+
+        .fame-rating {
+            float: right;
+            color: #ffcc00;
+        }
+
+        .crowd-bg {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: repeating-linear-gradient(90deg, #ff6600 0px, #ff6600 20px, #cc4400 20px, #cc4400 40px);
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="crowd-bg"></div>
+
+    <div class="container">
+        <h1>🎤 SILLY SPORTS COMMENTATOR 3000 🎤</h1>
+        <p class="subtitle">Turn ANYTHING into an EXCITING SPORTS EVENT!</p>
+
+        <div class="booth">
+            <div class="microphone">
+                <div class="mic">
+                    <div class="mic-head"></div>
+                    <div class="mic-stand"></div>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <textarea id="eventInput" placeholder="What happened? (e.g., 'the cat ran across the kitchen')"></textarea>
+                <button class="announce-btn" onclick="announceEvent()">🎤 ANNOUNCE IT! 🎤</button>
+            </div>
+        </div>
+
+        <div class="excitement-meter">
+            <div class="excitement-label">📊 EXCITEMENT METER 📊</div>
+            <div class="excitement-bar-container">
+                <div class="excitement-bar" id="excitementBar"></div>
+                <div class="excitement-number" id="excitementNumber">0/10</div>
+            </div>
+            <div class="excitement-emoji" id="excitementEmoji">😐</div>
+        </div>
+
+        <div class="sound-effect" id="soundEffect"></div>
+
+        <div class="commentary-display">
+            <div class="commentary-text" id="commentaryText">
+                Type something exciting and click ANNOUNCE IT!<br>
+                The crowd is waiting!!!
+            </div>
+        </div>
+
+        <button class="replay-btn" id="replayBtn" onclick="instantReplay()">🔄 INSTANT REPLAY WITH MORE EXCITEMENT! 🔄</button>
+
+        <div class="hall-of-fame">
+            <h3>🏆 HALL OF FAME - TOP 5 MOST EXCITING 🏆</h3>
+            <div id="hallOfFameList">
+                <p style="text-align: center; color: #888; font-style: italic;">No legendary moments yet...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let hallOfFame = JSON.parse(localStorage.getItem('sportsHallOfFame')) || [];
+        let currentEvent = '';
+        let currentExcitement = 0;
+
+        const soundEffects = [
+            '*CROWD GOES WILD*',
+            '*BRRRRRRRUMP-BRRRRRRUMP!*',
+            '*GAAAAAAASP!*',
+            '*RECORD SCRATCH*',
+            '*BOOM!*',
+            '*CHEERS ERUPT!*',
+            '*THE ROAR OF THE STADIUM!*',
+            '*UNBELIEVABLE!*',
+            '*HISTORY IS MADE!*',
+            '*THE ELECTRICITY IN THE AIR!*'
+        ];
+
+        const commentaryTemplates = {
+            normal: [
+                'WOW WOW WOW!!! YOU WON\'T BELIEVE THIS FOLKS!!! {EVENT}!!! THE STADIUM IS GOING WILD!!!',
+                'UNBELIEVABLE!!! {EVENT}!!! THIS IS WHY WE WATCH SPORTS!!!',
+                'HISTORY IN THE MAKING!!! {EVENT} FOR THE FIRST TIME EVER!!!',
+                'CAN YOU BELIEVE IT?! {EVENT}!!! ABSOLUTELY INCREDIBLE!!!',
+                'LADIES AND GENTLEMEN!!! {EVENT}!!! WHAT A MOMENT!!!',
+                'THIS IS WHAT WE\'VE BEEN WAITING FOR!!! {EVENT}!!!',
+                'EXTRAORDINARY!!! {EVENT}!!! THE CROWD CAN\'T BELIEVE THEIR EYES!!!',
+                'MIRACLE UPON MIRACLE!!! {EVENT}!!! STUNNING!!!',
+                'THE DRAMA!!! THE EXCITEMENT!!! {EVENT}!!!',
+                'SPECTACULAR!!! {EVENT}!!! A ONCE IN A LIFETIME EVENT!!!'
+            ],
+            dog: [
+                'MAN\'S BEST FRIEND TAKES THE FIELD!!! {EVENT}!!! GOOD BOY ENERGY!!!',
+                'THE CANINE ATHLETE IS IN THE HOUSE!!! {EVENT}!!! WHO\'S A GOOD BOY?!',
+                'PAWSITIVELY INCREDIBLE!!! {EVENT}!!! TAIL WAGGING INTENSITY!!!'
+            ],
+            cat: [
+                'THE FURRY ATHLETE IS ON THE PROWL!!! {EVENT}!!! CAT-TASTIC!!!',
+                'FE-LINE THE POWER!!! {EVENT}!!! MEOW-NIFICENT PERFORMANCE!!!',
+                'THE FELINE SUPERSTAR STRIKES!!! {EVENT}!!! PURR-FECT!!!'
+            ],
+            baby: [
+                'THE TINIEST CHAMPION HAS ENTERED THE ARENA!!! {EVENT}!!! ADORABLE OVERLOAD!!!',
+                'BABY ATHLETICS ARE IN FULL SWING!!! {EVENT}!!! CUTENESS VICTORY!!!',
+                'THE FUTURE SUPERSTAR!!! {EVENT}!!! DIAPER DIVISION!!!'
+            ],
+            victory: [
+                'VICTORY!!! CHAMPIONSHIP MOMENT!!! {EVENT}!!! THE TROPHY IS THEIRS!!!',
+                'WINNER WINNER!!! {EVENT}!!! CHAMPIONS ARE MADE OF THIS!!!',
+                'GLORY AND GOLD!!! {EVENT}!!! VICTORY LAP TIME!!!'
+            ],
+            disaster: [
+                'OH NOOOO!!! DISASTER STRIKES!!! {EVENT}!!! THE AGONY OF DEFEAT!!!',
+                'HEARTBREAK!!! {EVENT}!!! THE CROWD GROWS SILENT!!!',
+                'DEVASTATION!!! {EVENT}!!! NOT THE OUTCOME WE WANTED!!!'
+            ],
+            robot: [
+                'A MECHANICAL MIRACLE!!! {EVENT}!!! THE FUTURE IS NOW!!!',
+                'BEEP BOOP EXCITEMENT!!! {EVENT}!!! ARTIFICIAL INTELLIGENCE MEETS ATHLETIC BRILLIANCE!!!',
+                'THE ROBOT REVOLUTION!!! {EVENT}!!! CALCULATED PERFECTION!!!'
+            ]
+        };
+
+        const extraExcitementWords = ['ABSOLUTELY', 'COMPLETELY', 'UTTERLY', 'LITERALLY', 'TOTALLY', '100%'];
+
+        function updateHallOfFame() {
+            const list = document.getElementById('hallOfFameList');
+            if (hallOfFame.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #888; font-style: italic;">No legendary moments yet...</p>';
+                return;
+            }
+
+            list.innerHTML = hallOfFame.map((entry, index) => `
+                <div class="fame-entry">
+                    <span class="fame-rating">${'⭐'.repeat(Math.ceil(entry.excitement / 2))} ${entry.excitement}/10</span>
+                    <strong>#${index + 1}</strong> ${entry.event}
+                </div>
+            `).join('');
+        }
+
+        function announceEvent() {
+            const input = document.getElementById('eventInput').value.trim();
+            if (!input) return;
+
+            currentEvent = input;
+            const words = input.split(/\s+/);
+            currentExcitement = Math.min(Math.ceil(words.length / 2), 10);
+
+            // Update excitement meter
+            document.getElementById('excitementBar').style.width = (currentExcitement * 10) + '%';
+            document.getElementById('excitementNumber').textContent = currentExcitement + '/10';
+
+            // Update emoji
+            let emoji = '😐';
+            if (currentExcitement >= 7) emoji = '🤩';
+            else if (currentExcitement >= 5) emoji = '😮';
+            else if (currentExcitement >= 3) emoji = '🙂';
+            document.getElementById('excitementEmoji').textContent = emoji;
+
+            // Generate commentary
+            const commentary = generateCommentary(input, false);
+            document.getElementById('commentaryText').innerHTML = commentary;
+
+            // Sound effect
+            document.getElementById('soundEffect').textContent = soundEffects[Math.floor(Math.random() * soundEffects.length)];
+
+            // Show replay button
+            document.getElementById('replayBtn').classList.add('show');
+
+            // Add to hall of fame
+            hallOfFame.push({ event: input, excitement: currentExcitement });
+            hallOfFame.sort((a, b) => b.excitement - a.excitement);
+            hallOfFame = hallOfFame.slice(0, 5);
+            localStorage.setItem('sportsHallOfFame', JSON.stringify(hallOfFame));
+            updateHallOfFame();
+
+            // Clear input
+            document.getElementById('eventInput').value = '';
+        }
+
+        function generateCommentary(event, isReplay) {
+            const lower = event.toLowerCase();
+            let templates = commentaryTemplates.normal;
+
+            if (lower.includes('dog') || lower.includes('puppy') || lower.includes('pup')) {
+                templates = commentaryTemplates.dog;
+            } else if (lower.includes('cat') || lower.includes('kitten') || lower.includes('kitty')) {
+                templates = commentaryTemplates.cat;
+            } else if (lower.includes('baby') || lower.includes('toddler') || lower.includes('infant')) {
+                templates = commentaryTemplates.baby;
+            } else if (lower.includes('won') || lower.includes('win') || lower.includes('scored') || lower.includes('victory') || lower.includes('champion')) {
+                templates = commentaryTemplates.victory;
+            } else if (lower.includes('fell') || lower.includes('drop') || lower.includes('lose') || lower.includes('lost') || lower.includes('fail') || lower.includes('oops')) {
+                templates = commentaryTemplates.disaster;
+            } else if (lower.includes('robot') || lower.includes('machine') || lower.includes('computer') || lower.includes('ai')) {
+                templates = commentaryTemplates.robot;
+            }
+
+            let commentary = templates[Math.floor(Math.random() * templates.length)];
+
+            // Add extra words if replay
+            if (isReplay) {
+                const extra = extraExcitementWords[Math.floor(Math.random() * extraExcitementWords.length)];
+                commentary = commentary.replace('{EVENT}', '{EXTRA} {EVENT}');
+                commentary = commentary.replace('{EXTRA}', extra);
+            }
+
+            // Highlight key words
+            let displayEvent = event.toUpperCase();
+            if (isReplay) {
+                displayEvent = '<span style="color: #ffcc00;">' + displayEvent + '</span>';
+            }
+
+            return commentary.replace('{EVENT}', displayEvent);
+        }
+
+        function instantReplay() {
+            if (!currentEvent) return;
+
+            const commentary = generateCommentary(currentEvent, true);
+            document.getElementById('commentaryText').innerHTML = commentary;
+
+            // More intense sound effect for replay
+            document.getElementById('soundEffect').innerHTML = '*INSTANT REPLAY!!!* ' + soundEffects[Math.floor(Math.random() * soundEffects.length)];
+
+            // Boost excitement meter for replay
+            const boostExcitement = Math.min(currentExcitement + 2, 10);
+            document.getElementById('excitementBar').style.width = (boostExcitement * 10) + '%';
+            document.getElementById('excitementNumber').textContent = boostExcitement + '/10 (+REPLAY BOOST!)';
+            document.getElementById('excitementEmoji').textContent = '🤩🤩🤩';
+        }
+
+        // Initialize
+        updateHallOfFame();
+
+        // Enter key to announce
+        document.getElementById('eventInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                announceEvent();
+            }
+        });
+    </script>
+</body>
+</html>

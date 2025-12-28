@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Weather Wizard's Crystal Ball 🌟</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0a0a2e 0%, #1a0a3e 50%, #2a1a4e 100%);
+            color: #e0d0ff;
+            overflow-x: hidden;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            color: #ffd700;
+            text-shadow: 0 0 20px #ffaa00, 0 0 40px #ff8800;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-style: italic;
+            color: #aa88cc;
+            margin-bottom: 30px;
+        }
+
+        .crystal-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .realm-name {
+            font-size: 1.5rem;
+            color: #88ccff;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #4488ff;
+        }
+
+        .crystal-ball {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4) 0%, rgba(138, 43, 226, 0.6) 30%, rgba(75, 0, 130, 0.8) 60%, rgba(25, 0, 50, 0.9) 100%);
+            box-shadow: 0 0 60px currentColor, 0 0 100px currentColor, inset 0 0 40px rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+            transition: all 1s ease;
+            animation: float 4s ease-in-out infinite;
+            --ball-color: #8844ff;
+            color: var(--ball-color);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .stand {
+            width: 140px;
+            height: 30px;
+            background: linear-gradient(180deg, #665588 0%, #443366 100%);
+            margin: -10px auto 0;
+            border-radius: 0 0 70px 70px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .summon-btn {
+            background: linear-gradient(180deg, #8844ff 0%, #6622cc 100%);
+            color: white;
+            border: 2px solid #aa77ff;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-family: 'Georgia', serif;
+            cursor: pointer;
+            border-radius: 25px;
+            margin: 20px auto;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .summon-btn:hover {
+            background: linear-gradient(180deg, #aa66ff 0%, #8844ff 100%);
+            box-shadow: 0 0 30px rgba(136, 68, 255, 0.7);
+            transform: scale(1.05);
+        }
+
+        .weather-display {
+            background: rgba(60, 20, 100, 0.5);
+            border: 2px solid #8844ff;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .weather-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .weather-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .detail {
+            background: rgba(40, 15, 70, 0.7);
+            border-radius: 10px;
+            padding: 15px 10px;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: #aa88cc;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
+        .adventure-rating {
+            background: linear-gradient(135deg, #ffaa00 0%, #ff6600 100%);
+            color: #1a1a1a;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: rgba(60, 20, 100, 0.5);
+            border: 2px solid #6633cc;
+            color: #b088ff;
+            padding: 12px;
+            font-family: 'Georgia', serif;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: rgba(100, 40, 150, 0.8);
+            border-color: #aa77ff;
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(60, 20, 100, 0.5);
+            border: 2px solid #8844ff;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .journal-entry {
+            background: rgba(40, 15, 70, 0.7);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .journal-date {
+            color: #8888ff;
+            font-size: 0.8rem;
+        }
+
+        .journal-realm {
+            color: #ffaa88;
+        }
+
+        .journal-weather {
+            color: #aaddff;
+        }
+
+        .challenge-area {
+            text-align: center;
+        }
+
+        .challenge-weather {
+            font-size: 2rem;
+            padding: 30px;
+            background: rgba(40, 15, 70, 0.7);
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .challenge-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .challenge-btn {
+            flex: 1;
+            padding: 20px;
+            font-size: 1.1rem;
+            font-family: 'Georgia', serif;
+            cursor: pointer;
+            border-radius: 15px;
+            border: 3px solid;
+            transition: all 0.3s;
+        }
+
+        .good-btn {
+            background: linear-gradient(180deg, #44aa44 0%, #228822 100%);
+            border-color: #66cc66;
+            color: white;
+        }
+
+        .good-btn:hover {
+            background: linear-gradient(180deg, #66cc66 0%, #44aa44 100%);
+        }
+
+        .bad-btn {
+            background: linear-gradient(180deg, #cc4444 0%, #aa2222 100%);
+            border-color: #cc6666;
+            color: white;
+        }
+
+        .bad-btn:hover {
+            background: linear-gradient(180deg, #dd6666 0%, #cc4444 100%);
+        }
+
+        .score-display {
+            font-size: 1.5rem;
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .challenge-result {
+            font-size: 1.3rem;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .challenge-result.correct {
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+        }
+
+        .challenge-result.wrong {
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid #ff0000;
+            color: #ff6666;
+        }
+
+        .wizard-badge {
+            display: none;
+            text-align: center;
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            color: #1a1a1a;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            animation: glow 1s ease infinite;
+        }
+
+        .wizard-badge.show {
+            display: block;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px #ffd700; }
+            50% { box-shadow: 0 0 40px #ffd700, 0 0 60px #ff8c00; }
+        }
+
+        .falling-emoji {
+            position: fixed;
+            font-size: 2rem;
+            pointer-events: none;
+            z-index: 100;
+            animation: fall 3s linear forwards;
+        }
+
+        @keyframes fall {
+            0% {
+                opacity: 1;
+                transform: translateY(-50px) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        @media (max-width: 500px) {
+            .weather-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+
+    <div class="container">
+        <h1>🌟 WEATHER WIZARD'S CRYSTAL BALL 🌟</h1>
+        <p class="subtitle">Gaze into the orb and see the magical realms!</p>
+
+        <div class="wizard-badge" id="wizardBadge">
+            <div style="font-size: 3rem;">🧙‍♂️</div>
+            <div style="font-size: 1.5rem;">GRAND WIZARD METEOROLOGIST!</div>
+            <div>You have mastered the magical weather arts!</div>
+        </div>
+
+        <div class="crystal-section">
+            <div class="realm-name" id="realmName">Select a realm below...</div>
+            <div class="crystal-ball" id="crystalBall">🔮</div>
+            <div class="stand"></div>
+            <button class="summon-btn" onclick="summonWeather()">✨ SUMMON WEATHER ✨</button>
+        </div>
+
+        <div class="weather-display" id="weatherDisplay">
+            <div style="text-align: center; color: #8888ff; font-style: italic;">
+                Click "Summon Weather" to see the magical forecast!
+            </div>
+        </div>
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="switchTab('journal')">📜 Weather Journal</button>
+            <button class="tab-btn" onclick="switchTab('challenge')">🎮 Forecast Challenge</button>
+        </div>
+
+        <div class="tab-content active" id="journalTab">
+            <h3 style="text-align: center; color: #b088ff; margin-bottom: 15px;">Recent Magical Forecasts</h3>
+            <div id="journalList">
+                <p style="text-align: center; color: #6666aa; font-style: italic;">No weather recorded yet...</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="challengeTab">
+            <div class="challenge-area">
+                <div class="score-display">Score: <span id="challengeScore">0</span>/10</div>
+                <div class="challenge-weather" id="challengeWeather">
+                    Click "New Challenge" to begin!
+                </div>
+                <div class="challenge-buttons">
+                    <button class="challenge-btn good-btn" onclick="answerChallenge(true)">👍 GOOD for Quests!</button>
+                    <button class="challenge-btn bad-btn" onclick="answerChallenge(false)">👎 BAD for Quests!</button>
+                </div>
+                <div class="challenge-result" id="challengeResult"></div>
+                <button class="summon-btn" onclick="newChallenge()" style="font-size: 1rem; padding: 10px 25px;">New Challenge</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Weather types
+        const weatherTypes = {
+            candy: {
+                name: '🌈 RAINING CANDY',
+                color: '#ff69b4',
+                emoji: '🍬',
+                temp: ['Warm enough to melt chocolate', 'Perfect for picnics!', 'Sticky but sweet!'],
+                wind: ['Gentle sugar dust breeze', 'Whiffs of cotton candy', 'Sweet-smelling gusts'],
+                humidity: ['Sticky like lollipop', 'Humid as jelly', 'Sugar-coated air'],
+                goodForQuest: true,
+                adventureRating: '⭐⭐⭐ SWEET ADVENTURE!'
+            },
+            dragon: {
+                name: '🔥 DRAGON BREATH HEAT WAVE',
+                color: '#ff4500',
+                emoji: '🔥',
+                temp: ['Hot as dragon fire!', 'Bring sunscreen AND a shield!', 'Toast-your-toes hot'],
+                wind: ['Scorching gusts', 'Heat waves from the mountains', 'Dragon sigh breezes'],
+                humidity: ['Dry as dragon bones', 'Arid as desert sand', 'Sizzle-dry air'],
+                goodForQuest: false,
+                adventureRating: '⭐ DANGEROUS - BRING WATER!'
+            },
+            frost: {
+                name: '❄️ FROST GIANT\'S SNOWSTORM',
+                color: '#87ceeb',
+                emoji: '❄️',
+                temp: ['Cold as a witch\'s... toe!', 'Freeze-your-whiskers cold!', 'Brrr-r-r-r!'],
+                wind: ['Howling giant breath', 'Numbing northern gusts', 'Icy whispers'],
+                humidity: ['Dry and crisp', 'Frozen air crystals', 'Sharp as ice'],
+                goodForQuest: false,
+                adventureRating: '⭐⭐ BRAVE HEROES ONLY!'
+            },
+            wizard: {
+                name: '⚡ WIZARD\'S THUNDER STORM',
+                color: '#9400d3',
+                emoji: '⚡',
+                temp: ['Electrically charged', 'Ozone-scented cool', 'Magically mild'],
+                wind: ['Gale-force magic winds', 'Spell-casting gusts', 'Mystic turbulence'],
+                humidity: ['Charged with mana', 'Static-filled air', 'Magic mist rising'],
+                goodForQuest: false,
+                adventureRating: '⚡ DANGEROUS MAGIC AHEAD!'
+            },
+            pixie: {
+                name: '🧚 PIXIE DUST BREEZE',
+                color: '#ffff00',
+                emoji: '✨',
+                temp: ['Perfect pixie playground temp', 'Gentle golden warmth', 'Dreamy mild'],
+                wind: ['Giggling fairy breezes', 'Ticklish pixie puffs', 'Dance-worthy gusts'],
+                humidity: ['Spark-fresh air', 'Light as laughter', 'Magically misty'],
+                goodForQuest: true,
+                adventureRating: '⭐⭐⭐ PERFECT FOR ADVENTURES!'
+            },
+            midnight: {
+                name: '🌙 MIDNIGHT VOID',
+                color: '#1a0a2e',
+                emoji: '🌟',
+                temp: ['Cold as deep space', 'Shadow-chilled', 'Void-cold'],
+                wind: ['Silent emptiness', 'Ghostly stillness', 'Whispers from beyond'],
+                humidity: ['Bone-dry void', 'Empty air', 'Nothingness moist'],
+                goodForQuest: false,
+                adventureRating: '🌙 ONLY FOR NIGHT WALKERS!'
+            },
+            cherry: {
+                name: '🌸 CHERRY BLOSSOM WHIRLWIND',
+                color: '#ffb7c5',
+                emoji: '🌸',
+                temp: ['Gentle spring breeze warmth', 'Petal-soft mildness', 'Perfect flower-viewing temp'],
+                wind: ['Dancing petal gusts', 'Romantic whirlwinds', 'Sakura swirls'],
+                humidity: ['Fresh flower scent', 'Petal-perfect air', 'Garden-fresh'],
+                goodForQuest: true,
+                adventureRating: '⭐⭐⭐ BEAUTIFUL JOURNEY AHEAD!'
+            },
+            sunshine: {
+                name: '🐉 DRAGON EGG SUNSHINE',
+                color: '#ffd700',
+                emoji: '🌞',
+                temp: ['Golden glorious warmth!', 'Perfect adventure temp!', 'Hero-friendly heat!'],
+                wind: ['Gentle tropical breeze', 'Quest-calming winds', 'Hero\'s tailwind'],
+                humidity: ['Perfect potion weather', 'Comfortable castle air', 'Dry and daring'],
+                goodForQuest: true,
+                adventureRating: '⭐⭐⭐⭐⭐ LEGENDARY WEATHER!'
+            },
+            ghost: {
+                name: '💀 GHOST FOG',
+                color: '#888888',
+                emoji: '👻',
+                temp: ['Chilling to the bone', 'Spectral cold', 'Eerie mildness'],
+                wind: ['Haunting whispers', 'Phantom gusts', 'Spirit sighs'],
+                humidity: ['Damp as the undead', 'Misty and mysterious', 'Ghost-dew heavy'],
+                goodForQuest: false,
+                adventureRating: '💀 SPOOKY - BRING A GHOST HUNTER!'
+            },
+            mermaid: {
+                name: '🌊 MERMAID\'S OCEAN MIST',
+                color: '#40e0d0',
+                emoji: '🌊',
+                temp: ['Refreshing sea coolness', 'Beach-perfect mild', 'Ocean-breeze fresh'],
+                wind: ['Salty sea sprays', 'Mermaid song gusts', 'Ocean whispers'],
+                humidity: ['Sea-salt fresh', 'Ocean-mist thick', 'Tropical damp'],
+                goodForQuest: true,
+                adventureRating: '⭐⭐⭐⭐ GREAT FOR SEA QUESTS!'
+            }
+        };
+
+        const realms = [
+            'Candy Kingdom', 'Dragon\'s Peak', 'Enchanted Forest', 'Crystal Caves',
+            'Pixie Hollow', 'Shadow Valley', 'Star Mountain', 'Moonlit Bay',
+            'Frost Giant\'s Domain', 'Mermaid Lagoon', 'Wizard\'s Tower',
+            'Phoenix Roost', 'Unicorn Meadows', 'Goblin Market',
+            'Spirit Lake', 'Thunder Falls', 'Rainbow Bridge'
+        ];
+
+        let journal = JSON.parse(localStorage.getItem('weatherJournal')) || [];
+        let challengeScore = parseInt(localStorage.getItem('challengeScore')) || 0;
+        let currentChallengeWeather = null;
+
+        // Create stars
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 80; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.width = star.style.height = (Math.random() * 3 + 1) + 'px';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        document.getElementById('challengeScore').textContent = challengeScore;
+        if (challengeScore >= 10) {
+            document.getElementById('wizardBadge').classList.add('show');
+        }
+        updateJournalDisplay();
+
+        function summonWeather() {
+            const weatherKeys = Object.keys(weatherTypes);
+            const randomKey = weatherKeys[Math.floor(Math.random() * weatherKeys.length)];
+            const weather = weatherTypes[randomKey];
+            const realm = realms[Math.floor(Math.random() * realms.length)];
+
+            // Update crystal ball
+            const ball = document.getElementById('crystalBall');
+            ball.style.setProperty('--ball-color', weather.color);
+            ball.style.boxShadow = `0 0 60px ${weather.color}, 0 0 100px ${weather.color}, inset 0 0 40px rgba(255, 255, 255, 0.2)`;
+            ball.textContent = weather.emoji;
+
+            // Create falling emojis
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => createFallingEmoji(weather.emoji), i * 100);
+            }
+
+            // Update display
+            document.getElementById('realmName').textContent = `📍 ${realm}`;
+
+            const temp = weather.temp[Math.floor(Math.random() * weather.temp.length)];
+            const wind = weather.wind[Math.floor(Math.random() * weather.wind.length)];
+            const humidity = weather.humidity[Math.floor(Math.random() * weather.humidity.length)];
+
+            document.getElementById('weatherDisplay').innerHTML = `
+                <div class="weather-title" style="color: ${weather.color}">${weather.name}</div>
+                <div class="weather-details">
+                    <div class="detail">
+                        <div class="detail-label">🌡️ TEMPERATURE</div>
+                        <div class="detail-value">${temp}</div>
+                    </div>
+                    <div class="detail">
+                        <div class="detail-label">💨 WIND</div>
+                        <div class="detail-value">${wind}</div>
+                    </div>
+                    <div class="detail">
+                        <div class="detail-label">💧 HUMIDITY</div>
+                        <div class="detail-value">${humidity}</div>
+                    </div>
+                </div>
+                <div class="adventure-rating">${weather.adventureRating}</div>
+            `;
+
+            // Add to journal
+            const entry = {
+                date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+                realm: realm,
+                weather: weather.name,
+                rating: weather.adventureRating
+            };
+
+            journal.unshift(entry);
+            journal = journal.slice(0, 10);
+            localStorage.setItem('weatherJournal', JSON.stringify(journal));
+            updateJournalDisplay();
+        }
+
+        function createFallingEmoji(emoji) {
+            const elem = document.createElement('div');
+            elem.className = 'falling-emoji';
+            elem.textContent = emoji;
+            elem.style.left = Math.random() * 100 + '%';
+            document.body.appendChild(elem);
+            setTimeout(() => elem.remove(), 3000);
+        }
+
+        function updateJournalDisplay() {
+            const list = document.getElementById('journalList');
+            if (journal.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #6666aa; font-style: italic;">No weather recorded yet...</p>';
+                return;
+            }
+
+            list.innerHTML = journal.map(entry => `
+                <div class="journal-entry">
+                    <div class="journal-date">📅 ${entry.date}</div>
+                    <div class="journal-realm">📍 ${entry.realm}</div>
+                    <div class="journal-weather">${entry.weather}</div>
+                    <div style="margin-top: 5px; color: #ffaa00; font-size: 0.85rem;">${entry.rating}</div>
+                </div>
+            `).join('');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (tab === 'journal') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('journalTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('challengeTab').classList.add('active');
+            }
+        }
+
+        function newChallenge() {
+            const weatherKeys = Object.keys(weatherTypes);
+            const randomKey = weatherKeys[Math.floor(Math.random() * weatherKeys.length)];
+            currentChallengeWeather = weatherTypes[randomKey];
+
+            document.getElementById('challengeWeather').innerHTML = `
+                <div style="font-size: 4rem; margin-bottom: 10px;">${currentChallengeWeather.emoji}</div>
+                <div>${currentChallengeWeather.name}</div>
+            `;
+            document.getElementById('challengeResult').className = 'challenge-result';
+            document.getElementById('challengeResult').textContent = '';
+        }
+
+        function answerChallenge(isGood) {
+            if (!currentChallengeWeather) return;
+
+            const resultDiv = document.getElementById('challengeResult');
+            const correct = isGood === currentChallengeWeather.goodForQuest;
+
+            if (correct) {
+                challengeScore = Math.min(challengeScore + 1, 999);
+                resultDiv.className = 'challenge-result correct';
+                resultDiv.textContent = '✓ CORRECT! Well done, apprentice!';
+            } else {
+                challengeScore = Math.max(0, challengeScore - 1);
+                resultDiv.className = 'challenge-result wrong';
+                resultDiv.textContent = `✗ WRONG! This weather is ${currentChallengeWeather.goodForQuest ? 'GOOD' : 'BAD'} for quests!`;
+            }
+
+            document.getElementById('challengeScore').textContent = challengeScore;
+            localStorage.setItem('challengeScore', challengeScore);
+
+            if (challengeScore >= 10) {
+                document.getElementById('wizardBadge').classList.add('show');
+            }
+
+            currentChallengeWeather = null;
+        }
+
+        // Initialize with first challenge
+        newChallenge();
+    </script>
+</body>
+</html>

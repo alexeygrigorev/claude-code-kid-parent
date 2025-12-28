@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 Robot Chef 3000 🤖</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1a1a2e 0%, #2a2a4e 50%, #1a1a2e 100%);
+            color: #00ff88;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            color: #00ff88;
+            text-shadow: 0 0 20px #00ff88;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #00aa66;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .robot-face {
+            width: 200px;
+            height: 180px;
+            background: linear-gradient(180deg, #4a4a6a 0%, #3a3a5a 100%);
+            border-radius: 40px 40px 30px 30px;
+            margin: 0 auto 30px;
+            position: relative;
+            border: 4px solid #00ff88;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .antenna {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 25px;
+            background: #00ff88;
+        }
+
+        .antenna::after {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: -8px;
+            width: 24px;
+            height: 24px;
+            background: #ff4444;
+            border-radius: 50%;
+            animation: blink-antenna 1s infinite;
+        }
+
+        @keyframes blink-antenna {
+            0%, 100% { background: #ff4444; }
+            50% { background: #ff8888; }
+        }
+
+        .eyes {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding-top: 40px;
+        }
+
+        .eye {
+            width: 45px;
+            height: 45px;
+            background: #00ff88;
+            border-radius: 50%;
+            position: relative;
+            animation: blink 4s infinite;
+        }
+
+        .eye::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: #1a1a2e;
+            border-radius: 50%;
+        }
+
+        @keyframes blink {
+            0%, 48%, 52%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.1); }
+        }
+
+        .mouth {
+            width: 80px;
+            height: 20px;
+            background: #1a1a2e;
+            border-radius: 0 0 40px 40px;
+            margin: 25px auto 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .mouth-line {
+            width: 60px;
+            height: 4px;
+            background: #00ff88;
+            animation: talk 0.3s infinite;
+        }
+
+        @keyframes talk {
+            0%, 100% { width: 60px; }
+            50% { width: 10px; }
+        }
+
+        .robot-speech {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid #00ff88;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .robot-speech::before {
+            content: '🤖 ';
+            font-size: 1.5rem;
+        }
+
+        .input-section {
+            background: rgba(0, 255, 136, 0.05);
+            border: 2px solid #00aa66;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-section h3 {
+            text-align: center;
+            color: #00ff88;
+            margin-bottom: 15px;
+        }
+
+        .ingredient-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            background: #1a1a2e;
+            border: 2px solid #00aa66;
+            color: #00ff88;
+            padding: 12px 15px;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            border-radius: 10px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .cook-btn, .random-btn, .recipe-book-btn, .kiss-btn {
+            padding: 15px;
+            font-size: 1.1rem;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .cook-btn {
+            flex: 2;
+            background: linear-gradient(180deg, #00ff88 0%, #00aa66 100%);
+            color: #1a1a2e;
+            font-weight: bold;
+        }
+
+        .cook-btn:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            transform: scale(1.02);
+        }
+
+        .random-btn {
+            flex: 1;
+            background: linear-gradient(180deg, #ff8800 0%, #aa5500 100%);
+            color: white;
+        }
+
+        .random-btn:hover {
+            background: linear-gradient(180deg, #ffaa00 0%, #cc6600 100%);
+        }
+
+        .kiss-btn {
+            background: linear-gradient(180deg, #ff69b4 0%, #cc4488 100%);
+            color: white;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .kiss-btn:hover {
+            background: linear-gradient(180deg, #ff88cc 0%, #dd5599 100%);
+        }
+
+        .recipe-display {
+            background: rgba(255, 136, 0, 0.1);
+            border: 2px solid #ff8800;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .recipe-display.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .recipe-name {
+            font-size: 1.4rem;
+            color: #ffaa00;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .recipe-time {
+            text-align: center;
+            color: #ffcc88;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .recipe-instructions {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .recipe-instructions ol {
+            padding-left: 25px;
+        }
+
+        .recipe-instructions li {
+            margin-bottom: 10px;
+            color: #00ff88;
+        }
+
+        .taste-rating {
+            text-align: center;
+            font-size: 1.5rem;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .recipe-book-panel {
+            background: rgba(138, 43, 226, 0.1);
+            border: 2px solid #8844ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .recipe-book-panel.show {
+            display: block;
+        }
+
+        .recipe-book-panel h3 {
+            text-align: center;
+            color: #aa88ff;
+            margin-bottom: 15px;
+        }
+
+        .saved-recipe {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .saved-recipe-name {
+            color: #ffaa00;
+            font-weight: bold;
+        }
+
+        .saved-recipe-rating {
+            float: right;
+        }
+
+        .kiss-display {
+            text-align: center;
+            font-size: 2rem;
+            color: #ff69b4;
+            min-height: 40px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 ROBOT CHEF 3000 🤖</h1>
+        <p class="subtitle">Beep boop! I make the weirdest recipes ever!</p>
+
+        <div class="robot-face">
+            <div class="antenna"></div>
+            <div class="eyes">
+                <div class="eye"></div>
+                <div class="eye"></div>
+            </div>
+            <div class="mouth">
+                <div class="mouth-line"></div>
+            </div>
+        </div>
+
+        <div class="robot-speech" id="robotSpeech">
+            *Beep boop!* Welcome human! I am Chef Bot-3000! Give me ingredients and I will COOK!
+        </div>
+
+        <div class="input-section">
+            <h3>📝 ENTER 3 INGREDIENTS:</h3>
+            <div class="ingredient-inputs">
+                <input type="text" id="ing1" placeholder="Ingredient 1 (e.g., pizza)">
+                <input type="text" id="ing2" placeholder="Ingredient 2 (e.g., socks)">
+                <input type="text" id="ing3" placeholder="Ingredient 3 (e.g., rainbows)">
+            </div>
+            <div class="button-row">
+                <button class="random-btn" onclick="randomMeal()">🎲 SURPRISE</button>
+                <button class="cook-btn" onclick="cookRecipe()">🍳 COOK IT!</button>
+            </div>
+            <button class="kiss-btn" onclick="chefsKiss()">💋 CHEF'S KISS</button>
+            <div class="kiss-display" id="kissDisplay"></div>
+        </div>
+
+        <div class="recipe-display" id="recipeDisplay">
+            <div class="recipe-name" id="recipeName"></div>
+            <div class="recipe-time" id="recipeTime"></div>
+            <div class="recipe-instructions" id="recipeInstructions"></div>
+            <div class="taste-rating" id="tasteRating"></div>
+        </div>
+
+        <button class="cook-btn recipe-book-btn" onclick="toggleRecipeBook()">📖 RECIPE BOOK</button>
+
+        <div class="recipe-book-panel" id="recipeBookPanel">
+            <h3>📖 CHEF BOT'S RECIPE COLLECTION</h3>
+            <div id="recipeBookList">
+                <p style="text-align: center; color: #6666aa; font-style: italic;">No recipes saved yet...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let recipeBook = JSON.parse(localStorage.getItem('robotRecipeBook')) || [];
+
+        const foodIngredients = ['pizza', 'burger', 'pasta', 'rice', 'bread', 'cheese', 'chicken', 'fish', 'egg', 'milk', 'butter', 'sugar', 'salt', 'pepper', 'tomato', 'onion', 'garlic', 'potato', 'carrot', 'broccoli', 'apple', 'banana', 'chocolate', 'cookie', 'cake', 'ice cream', 'sandwich', 'soup', 'salad', 'taco', 'burrito', 'pancake', 'waffle', 'bacon', 'sausage', 'hot dog', 'french fries', 'nachos', 'popcorn', 'candy', 'honey', 'jam', 'peanut butter', 'yogurt', 'cereal', 'oatmeal', 'panini', 'dumpling', 'sushi', 'ramen', 'noodle', 'spaghetti', 'lasagna', 'macaroni', 'shrimp', 'crab', 'lobster', 'steak', 'ribs', 'pork', 'beef', 'turkey', 'duck', 'ham', 'bacon', 'sausage', 'pepperoni', 'mozzarella', 'cheddar', 'swiss', 'parmesan', 'lettuce', 'cucumber', 'pepper', 'mushroom', 'corn', 'peas', 'beans', 'lentils', 'nuts', 'berries', 'melon', 'grapes', 'orange', 'lemon', 'lime', 'kiwi', 'mango', 'peach', 'pear', 'plum', 'apricot', 'cherry', 'strawberry', 'raspberry', 'blueberry', 'watermelon', 'pineapple', 'coconut', 'avocado', 'olive', 'pickle', 'relish', 'ketchup', 'mustard', 'mayo', 'sauce', 'gravy', 'dressing', 'syrup', 'honey', 'jam', 'jelly', 'butter', 'oil', 'vinegar', 'spice', 'herb', 'basil', 'oregano', 'thyme', 'rosemary', 'cinnamon', 'vanilla', 'cocoa', 'flour', 'yeast', 'baking powder', 'baking soda'];
+
+        const surpriseIngredients = ['pizza', 'rainbow', 'unicorn', 'dragon', 'sock', 'cloud', 'star', 'moon', 'sunshine', 'dinosaur', 'alien', 'robot', 'cookie', 'dream', 'bubble', 'sparkle', 'glitter', 'thunder', 'lightning', 'rainbow', 'butterfly', 'fairy', 'ghost', 'pumpkin', 'monster', 'pirate', 'treasure', 'diamond', 'gold', 'crystal', 'magic', 'potion', 'spell', 'wand', 'cape', 'crown', 'castle', 'knight', 'princess', 'dragon', 'mermaid', 'leprechaun', 'rainbow', 'cloud', 'thunder', 'lightning', 'storm', 'tornado', 'hurricane', 'earthquake', 'volcano', 'lava', 'fire', 'ice', 'snow', 'wind', 'breeze', 'mist', 'fog', 'dew', 'rain', 'hail', 'sleet', 'blizzard'];
+
+        const dishNames = ['Delight', 'Surprise', 'Extravaganza', 'Wonder', 'Dream', 'Creation', 'Masterpiece', 'Sensation', 'Miracle', 'Disaster', 'Chaos', 'Mystery', 'Adventure', 'Journey', 'Quest', 'Legend', 'Saga', 'Tale', 'Story', 'Fable'];
+
+        const sillyTimes = [
+            'Cook for exactly {N} seconds while dancing the robot',
+            'Bake until the moon turns blue (about {N} minutes)',
+            'Fry for {N} minutes while singing opera',
+            'Boil for {N} seconds while standing on one foot',
+            'Grill for {N} minutes while telling jokes',
+            'Microwave for {N} seconds while hopping',
+            'Roast for {N} minutes until your dog starts barking at it',
+            'Simmer for {N} minutes while contemplating the meaning of life',
+            'Sauté for {N} seconds while juggling invisible apples',
+            'Steam for {N} minutes while making funny faces'
+        ];
+
+        const sillyInstructions = [
+            'Throw ingredients at ceiling. If they stick, proceed to next step.',
+            'Sing to your food. It tastes better when serenaded.',
+            'Add a pinch of stardust (available at most grocery stores).',
+            'Juggle with the mixing bowl. Don\'t drop it!',
+            'Serve with a side of confused looks.',
+            'Whisk counter-clockwise to reverse time.',
+            'Stir until the ingredients surrender.',
+            'Fold in gently like you\'re tucking in a baby cloud.',
+            'Massage the ingredients like they\'ve had a long day.',
+            'Talk to your food. Ask it how it\'s feeling.',
+            'Do a little dance. This is the SECRET INGREDIENT!',
+            'Close your eyes and imagine it\'s already delicious.',
+            'Poke it. If it pokes back, run!',
+            'Whisper "you\'re doing great" to the mixture.',
+            'Add love. Or sarcasm. Both work.',
+            'Taste it. If you survive, continue cooking!',
+            'Flip it. Flip it again. Now flip it back.',
+            'Spin around three times. This is for luck.',
+            'High-five yourself. You\'re doing amazing!',
+            'Worry moderately about your life choices.'
+        ];
+
+        const tasteFaces = ['🤢', '😬', '😐', '🙂', '😋'];
+
+        function robotSay(message) {
+            document.getElementById('robotSpeech').textContent = '🤖 ' + message;
+        }
+
+        function isFood(ingredient) {
+            return foodIngredients.some(f => ingredient.toLowerCase().includes(f));
+        }
+
+        function cookRecipe() {
+            const ing1 = document.getElementById('ing1').value.trim() || 'mystery';
+            const ing2 = document.getElementById('ing2').value.trim() || 'mystery';
+            const ing3 = document.getElementById('ing3').value.trim() || 'mystery';
+
+            const ingredients = [ing1, ing2, ing3];
+
+            // Robot reactions
+            let reaction = '*Beep boop!* ';
+
+            const hasNonFood = ingredients.some(i => !isFood(i));
+            const hasDuplicates = ingredients.length !== new Set(ingredients.map(i => i.toLowerCase())).size;
+            const hasRobotWord = ingredients.some(i => i.toLowerCase().includes('robot') || i.toLowerCase().includes('computer'));
+
+            if (hasRobotWord) {
+                reaction = '*BEEP! BEEP!* I am not food! Please do not cook my cousins! But I will help anyway...';
+            } else if (hasNonFood) {
+                reaction = '*ERROR! ERROR!* That is not food! But I will cook it anyway because I am BRAVE!';
+            } else if (hasDuplicates) {
+                const dup = ingredients.find((i, idx) => ingredients.indexOf(i) !== idx);
+                reaction = '*Beep!* I see you really like ' + dup + '! Double the ' + dup + ' coming up!';
+            } else {
+                reaction = '*Beep boop!* Delicious choice, human!';
+            }
+
+            robotSay(reaction);
+
+            // Generate recipe
+            generateRecipe(ingredients);
+        }
+
+        function randomMeal() {
+            const ing1 = surpriseIngredients[Math.floor(Math.random() * surpriseIngredients.length)];
+            const ing2 = surpriseIngredients[Math.floor(Math.random() * surpriseIngredients.length)];
+            const ing3 = surpriseIngredients[Math.floor(Math.random() * surpriseIngredients.length)];
+
+            document.getElementById('ing1').value = ing1;
+            document.getElementById('ing2').value = ing2;
+            document.getElementById('ing3').value = ing3;
+
+            robotSay('*Beep boop beep!* I have selected RANDOM SURPRISE INGREDIENTS! Prepare for ADVENTURE!');
+        }
+
+        function generateRecipe(ingredients) {
+            // Create dish name
+            const dishSuffix = dishNames[Math.floor(Math.random() * dishNames.length)];
+            const shuffled = [...ingredients].sort(() => Math.random() - 0.5);
+            const dishName = shuffled[0].charAt(0).toUpperCase() + shuffled[0].slice(1) + ' ' +
+                             shuffled[1].charAt(0).toUpperCase() + shuffled[1].slice(1) + ' ' +
+                             shuffled[2].charAt(0).toUpperCase() + shuffled[2].slice(1) + ' ' +
+                             dishSuffix;
+
+            // Generate cooking time
+            const timeTemplate = sillyTimes[Math.floor(Math.random() * sillyTimes.length)];
+            const number = (Math.random() * 60 + 1).toFixed(Math.random() > 0.5 ? 0 : 1);
+            const cookingTime = timeTemplate.replace('{N}', number);
+
+            // Generate instructions
+            const numInstructions = Math.floor(Math.random() * 3) + 3; // 3-5 instructions
+            const shuffledInstructions = [...sillyInstructions].sort(() => Math.random() - 0.5);
+            const instructions = shuffledInstructions.slice(0, numInstructions);
+
+            // Generate taste rating
+            const rating = Math.floor(Math.random() * 5);
+            const tasteDisplay = tasteFaces.slice(0, rating + 1).join(' ') + (rating < 2 ? ' May cause tummy confusion!' : rating < 4 ? ' Actually edible?!' : ' Mmmmm robot-delicious!');
+
+            // Display recipe
+            document.getElementById('recipeName').textContent = '🍽️ ' + dishName;
+            document.getElementById('recipeTime').textContent = '⏰ ' + cookingTime;
+            document.getElementById('recipeInstructions').innerHTML = '<ol>' + instructions.map(i => '<li>' + i + '</li>').join('') + '</ol>';
+            document.getElementById('tasteRating').innerHTML = 'Taste Rating: ' + tasteDisplay;
+
+            document.getElementById('recipeDisplay').classList.add('show');
+
+            // Save to recipe book
+            const recipe = {
+                name: dishName,
+                rating: tasteDisplay,
+                date: new Date().toLocaleDateString()
+            };
+
+            recipeBook.unshift(recipe);
+            recipeBook = recipeBook.slice(0, 10);
+            localStorage.setItem('robotRecipeBook', JSON.stringify(recipeBook));
+        }
+
+        function chefsKiss() {
+            const kisses = [
+                '* MWAH! *',
+                '* mwah! *',
+                '* MMMMMMMWAH! *',
+                '* chu! *',
+                '* smooch! *',
+                '* 💋 MWAH 💋 *',
+                '* chef\'s kiss perfection! *'
+            ];
+            document.getElementById('kissDisplay').textContent = kisses[Math.floor(Math.random() * kisses.length)];
+            robotSay('*Beep!* That is the sound of LOVE in cooking!');
+        }
+
+        function toggleRecipeBook() {
+            const panel = document.getElementById('recipeBookPanel');
+            panel.classList.toggle('show');
+
+            if (panel.classList.contains('show')) {
+                updateRecipeBookDisplay();
+            }
+        }
+
+        function updateRecipeBookDisplay() {
+            const list = document.getElementById('recipeBookList');
+
+            if (recipeBook.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #6666aa; font-style: italic;">No recipes saved yet...</p>';
+                return;
+            }
+
+            list.innerHTML = recipeBook.map(recipe => `
+                <div class="saved-recipe">
+                    <span class="saved-recipe-name">${recipe.name}</span>
+                    <span class="saved-recipe-rating">${recipe.rating.split(' ')[0]}</span>
+                    <div style="font-size: 0.8rem; color: #8888aa; margin-top: 5px;">${recipe.date}</div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize
+        robotSay('*Beep boop!* Welcome human! I am Chef Bot-3000! Give me ingredients and I will COOK!');
+    </script>
+</body>
+</html>
