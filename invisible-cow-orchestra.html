@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐄 The Invisible Cow Orchestra</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            transition: background 2s ease;
+        }
+
+        .meadow {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(180deg, #87CEEB 0%, #87CEEB 40%, #4CAF50 40%, #45a049 100%);
+            cursor: pointer;
+            overflow: hidden;
+            transition: filter 0.5s ease;
+        }
+
+        .meadow.party {
+            background: linear-gradient(180deg, #FF6B6B 0%, #4ECDC4 30%, #FFE66D 50%, #95E1D3 70%, #F38181 100%);
+            animation: rainbow 3s infinite;
+        }
+
+        @keyframes rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        .sun {
+            position: absolute;
+            top: 40px;
+            right: 60px;
+            width: 80px;
+            height: 80px;
+            background: #FFD700;
+            border-radius: 50%;
+            box-shadow: 0 0 60px #FFD700;
+        }
+
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.9;
+        }
+
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .cloud1 { top: 60px; left: 10%; width: 100px; height: 40px; }
+        .cloud1::before { width: 50px; height: 50px; top: -25px; left: 15px; }
+        .cloud1::after { width: 40px; height: 40px; top: -20px; left: 50px; }
+
+        .cloud2 { top: 100px; left: 40%; width: 80px; height: 30px; }
+        .cloud2::before { width: 40px; height: 40px; top: -20px; left: 10px; }
+        .cloud2::after { width: 30px; height: 30px; top: -15px; left: 40px; }
+
+        .cloud3 { top: 50px; left: 70%; width: 120px; height: 45px; }
+        .cloud3::before { width: 60px; height: 60px; top: -30px; left: 20px; }
+        .cloud3::after { width: 45px; height: 45px; top: -22px; left: 65px; }
+
+        .cow {
+            position: absolute;
+            font-size: 48px;
+            pointer-events: none;
+            animation: cowAppear 1s forwards;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .cow.golden {
+            font-size: 64px;
+            animation: goldenCow 1.5s forwards;
+        }
+
+        @keyframes cowAppear {
+            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+            30% { transform: scale(1.3) rotate(10deg); opacity: 1; }
+            60% { transform: scale(1) rotate(-5deg); opacity: 1; }
+            100% { transform: scale(0.5) rotate(0deg); opacity: 0; }
+        }
+
+        @keyframes goldenCow {
+            0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+            25% { transform: scale(1.5) rotate(15deg); opacity: 1; filter: drop-shadow(0 0 20px gold); }
+            50% { transform: scale(1.8) rotate(0deg); opacity: 1; filter: drop-shadow(0 0 40px gold); }
+            100% { transform: scale(0) rotate(360deg); opacity: 0; }
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(139, 69, 19, 0.95);
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            align-items: center;
+            border-top: 4px solid #8B4513;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 18px;
+            font-family: 'Comic Sans MS', cursive;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-record {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-play {
+            background: linear-gradient(135deg, #27ae60, #1e8449);
+            color: white;
+        }
+
+        .btn-clear {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+        }
+
+        .stat {
+            background: rgba(255,255,255,0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .badge {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) scale(0);
+            background: linear-gradient(135deg, #f39c12, #e74c3c);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 30px;
+            font-size: 28px;
+            font-weight: bold;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            z-index: 1000;
+            animation: none;
+        }
+
+        .badge.show {
+            animation: badgeAppear 3s forwards;
+        }
+
+        @keyframes badgeAppear {
+            0% { transform: translateX(-50%) scale(0) rotate(-10deg); }
+            20% { transform: translateX(-50%) scale(1.2) rotate(5deg); }
+            40% { transform: translateX(-50%) scale(1) rotate(0deg); }
+            80% { transform: translateX(-50%) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translateX(-50%) scale(0.8) rotate(0deg); opacity: 0; }
+        }
+
+        .cow-fact {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.95);
+            padding: 15px 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            text-align: center;
+            font-size: 16px;
+            color: #333;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .cow-fact.show {
+            opacity: 1;
+        }
+
+        .recording-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .recording-indicator.show {
+            display: flex;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .rec-dot {
+            width: 12px;
+            height: 12px;
+            background: #e74c3c;
+            border-radius: 50%;
+        }
+
+        .grass-blade {
+            position: absolute;
+            bottom: 70px;
+            width: 8px;
+            background: #2d5016;
+            border-radius: 50% 50% 0 0;
+            transform-origin: bottom center;
+        }
+
+        .title {
+            position: fixed;
+            top: 10px;
+            left: 20px;
+            font-size: 24px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div class="meadow" id="meadow">
+        <div class="sun"></div>
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <div class="cloud cloud3"></div>
+    </div>
+
+    <div class="title">🐄 The Invisible Cow Orchestra 🎻</div>
+
+    <div class="badge" id="badge">🎼 MOO-SOVIAN COMPOSER! 🎼</div>
+
+    <div class="recording-indicator" id="recordingIndicator">
+        <div class="rec-dot"></div>
+        RECORDING...
+    </div>
+
+    <div class="cow-fact" id="cowFact">🐄 Cows have best friends and get sad when separated! 😢</div>
+
+    <div class="controls">
+        <div class="stat">🐄 Cows Found: <span id="cowCount">0</span></div>
+        <div class="stat">✨ Golden Cows: <span id="goldenCount">0</span></div>
+        <button class="btn btn-record" id="recordBtn">🔴 Moo-scribe</button>
+        <button class="btn btn-play" id="playBtn">▶️ Play Moo-sic</button>
+        <button class="btn btn-clear" id="clearBtn">🗑️ Clear</button>
+    </div>
+
+    <script>
+        const meadow = document.getElementById('meadow');
+        const cowCountEl = document.getElementById('cowCount');
+        const goldenCountEl = document.getElementById('goldenCount');
+        const badge = document.getElementById('badge');
+        const cowFactEl = document.getElementById('cowFact');
+        const recordingIndicator = document.getElementById('recordingIndicator');
+        const recordBtn = document.getElementById('recordBtn');
+        const playBtn = document.getElementById('playBtn');
+        const clearBtn = document.getElementById('clearBtn');
+
+        let cowCount = 0;
+        let goldenCount = 0;
+        let clickSpeed = 0;
+        let clicksInLastSecond = [];
+        let hasBadge = false;
+        let isRecording = false;
+        let recordedMoos = [];
+        let mooSequence = 0;
+
+        // Musical notes for moos (pentatonic scale for pleasant sounds)
+        const mooNotes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+        let noteIndex = 0;
+
+        const cowFacts = [
+            "🐄 Cows have best friends and get sad when separated! 😢",
+            "🐄 Cows can recognize over 100 other cows in their herd!",
+            "🐄 A cow's heart beats between 60-70 times per minute!",
+            "🐄 Cows can see almost 360 degrees around themselves!",
+            "🐄 Cows have an excellent sense of smell - up to 6 miles away!",
+            "🐄 Cows can hear lower and higher frequencies than humans!",
+            "🐄 A cow produces around 200,000 glasses of milk in her lifetime!",
+            "🐄 Cows sleep only about 4 hours a day!",
+            "🐄 Cows can digest food that humans can't!",
+            "🐄 Cows have four stomachs to help digest their food!",
+            "🐄 Cows can walk up stairs but not down!",
+            "🐄 The average cow chews at least 50 times per minute!",
+            "🐄 Cows have almost panoramic vision!",
+            "🐄 A cow stands up and lies down about 14 times a day!",
+            "🐄 Cows can learn their names and come when called!",
+            "🐄 Cows have been proven to hold grudges!",
+            "🐄 A cow's natural lifespan is about 20 years!",
+            "🐄 Cows make friends with cows they like!",
+            "🐄 Cows get excited when they solve problems!",
+            "🐄 Cows have a memory span of about 3 years!"
+        ];
+
+        // Create grass blades
+        function createGrass() {
+            for (let i = 0; i < 100; i++) {
+                const blade = document.createElement('div');
+                blade.className = 'grass-blade';
+                blade.style.left = Math.random() * 100 + '%';
+                blade.style.height = (20 + Math.random() * 30) + 'px';
+                blade.style.transform = `rotate(${-10 + Math.random() * 20}deg)`;
+                blade.style.opacity = 0.5 + Math.random() * 0.5;
+                meadow.appendChild(blade);
+            }
+        }
+        createGrass();
+
+        // Audio context for moos
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioCtx;
+        }
+
+        function playMoo(frequency, isGolden = false) {
+            const ctx = getAudioContext();
+            const oscillator = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(ctx.destination);
+
+            if (isGolden) {
+                // Golden trumpet sound
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(frequency * 2, ctx.currentTime);
+                gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+                oscillator.start(ctx.currentTime);
+                oscillator.stop(ctx.currentTime + 0.8);
+            } else {
+                // Regular musical moo
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.5, ctx.currentTime + 0.3);
+                gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                oscillator.start(ctx.currentTime);
+                oscillator.stop(ctx.currentTime + 0.5);
+            }
+        }
+
+        function showCow(x, y, isGolden = false) {
+            const cow = document.createElement('div');
+            cow.className = 'cow' + (isGolden ? ' golden' : '');
+            cow.textContent = isGolden ? '🐄✨' : '🐄';
+            cow.style.left = (x - 24) + 'px';
+            cow.style.top = (y - 24) + 'px';
+            meadow.appendChild(cow);
+
+            const note = mooNotes[noteIndex % mooNotes.length];
+            noteIndex++;
+
+            if (isGolden) {
+                playMoo(note, true);
+            } else {
+                playMoo(note, false);
+            }
+
+            if (isRecording) {
+                recordedMoos.push({
+                    x: x,
+                    y: y,
+                    isGolden: isGolden,
+                    note: note,
+                    delay: mooSequence
+                });
+            }
+            mooSequence++;
+
+            setTimeout(() => {
+                cow.remove();
+            }, isGolden ? 1500 : 1000);
+        }
+
+        function updateClickSpeed() {
+            const now = Date.now();
+            clicksInLastSecond = clicksInLastSecond.filter(t => now - t < 1000);
+            clickSpeed = clicksInLastSecond.length;
+
+            // Update meadow based on click speed
+            if (clickSpeed > 8) {
+                meadow.classList.add('party');
+            } else {
+                meadow.classList.remove('party');
+            }
+
+            // Check for badge
+            if (clickSpeed >= 10 && !hasBadge) {
+                hasBadge = true;
+                badge.classList.add('show');
+                setTimeout(() => {
+                    badge.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        function showRandomCowFact() {
+            const fact = cowFacts[Math.floor(Math.random() * cowFacts.length)];
+            cowFactEl.textContent = fact;
+            cowFactEl.classList.add('show');
+            setTimeout(() => {
+                cowFactEl.classList.remove('show');
+            }, 4000);
+        }
+
+        meadow.addEventListener('click', (e) => {
+            if (e.target.closest('.controls')) return;
+
+            const rect = meadow.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = Math.min(e.clientY - rect.top, rect.height - 150);
+
+            const isGolden = Math.random() < 0.1; // 10% chance for golden cow
+
+            showCow(x, y, isGolden);
+
+            cowCount++;
+            cowCountEl.textContent = cowCount;
+
+            if (isGolden) {
+                goldenCount++;
+                goldenCountEl.textContent = goldenCount;
+            }
+
+            clicksInLastSecond.push(Date.now());
+            updateClickSpeed();
+
+            // Show random cow fact occasionally
+            if (Math.random() < 0.15) {
+                showRandomCowFact();
+            }
+        });
+
+        // Recording controls
+        recordBtn.addEventListener('click', () => {
+            if (!isRecording) {
+                isRecording = true;
+                recordedMoos = [];
+                mooSequence = 0;
+                recordingIndicator.classList.add('show');
+                recordBtn.textContent = '⏹️ Stop';
+            } else {
+                isRecording = false;
+                recordingIndicator.classList.remove('show');
+                recordBtn.textContent = '🔴 Moo-scribe';
+            }
+        });
+
+        playBtn.addEventListener('click', () => {
+            if (recordedMoos.length === 0) return;
+
+            playBtn.disabled = true;
+            noteIndex = 0;
+
+            let maxDelay = 0;
+            recordedMoos.forEach(moo => {
+                maxDelay = Math.max(maxDelay, moo.delay);
+                setTimeout(() => {
+                    showCow(moo.x, moo.y, moo.isGolden);
+                }, moo.delay * 200);
+            });
+
+            setTimeout(() => {
+                playBtn.disabled = false;
+            }, maxDelay * 200 + 2000);
+        });
+
+        clearBtn.addEventListener('click', () => {
+            recordedMoos = [];
+            cowCount = 0;
+            goldenCount = 0;
+            cowCountEl.textContent = '0';
+            goldenCountEl.textContent = '0';
+            hasBadge = false;
+        });
+
+        // Show initial cow fact
+        setTimeout(showRandomCowFact, 1000);
+    </script>
+</body>
+</html>
